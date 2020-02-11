@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#
+# Start a local dask cluster
+#
+dask-scheduler --scheduler-file cluster.json --local-directory /tmp &
+sleep 3
+dask-worker --scheduler-file cluster.json --nprocs 2 --local-directory /tmp &
