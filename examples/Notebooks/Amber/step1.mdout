@@ -3,11 +3,11 @@
           Amber 18 SANDER                              2018
           -------------------------------------------------------
 
-| Run on 02/11/2020 at 20:23:50
+| Run on 02/24/2020 at 12:48:23
 
 |   Executable path: sander.MPI
 | Working directory: /wd
-|          Hostname: e11f0a3dd5cb
+|          Hostname: 5c05b5546c79
 
   [-O]verwriting output
 
@@ -238,3 +238,109 @@ Ewald parameters:
  VDWAALS =    11095.9484  EEL     =  -117911.8201  HBOND      =        0.0000
  1-4 VDW =      464.1600  1-4 EEL =     6669.5178  RESTRAINT  =        0.3004
  EAMBER  =   -92419.1701
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+    300      -9.2836E+04     9.0076E-01     5.3345E+01     CD       2092
+
+ BOND    =     6238.3471  ANGLE   =      376.8450  DIHED      =      729.6862
+ VDWAALS =    11488.9954  EEL     =  -118802.0209  HBOND      =        0.0000
+ 1-4 VDW =      463.4111  1-4 EEL =     6668.1655  RESTRAINT  =        0.3431
+ EAMBER  =   -92836.5706
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+    350      -9.3168E+04     8.0947E-01     4.8258E+01     CD       2092
+
+ BOND    =     6308.8718  ANGLE   =      374.7525  DIHED      =      727.9371
+ VDWAALS =    11810.8438  EEL     =  -119521.0864  HBOND      =        0.0000
+ 1-4 VDW =      462.9371  1-4 EEL =     6667.2469  RESTRAINT  =        0.3826
+ EAMBER  =   -93168.4972
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+    400      -9.3440E+04     7.3651E-01     4.5626E+01     CD       2092
+
+ BOND    =     6367.5924  ANGLE   =      373.3841  DIHED      =      726.6497
+ VDWAALS =    12083.2683  EEL     =  -120120.8217  HBOND      =        0.0000
+ 1-4 VDW =      462.6496  1-4 EEL =     6666.6731  RESTRAINT  =        0.4198
+ EAMBER  =   -93440.6046
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+    450      -9.3667E+04     6.7814E-01     4.1384E+01     CD       2092
+
+ BOND    =     6416.5543  ANGLE   =      372.0726  DIHED      =      725.6385
+ VDWAALS =    12312.9732  EEL     =  -120623.5148  HBOND      =        0.0000
+ 1-4 VDW =      462.4983  1-4 EEL =     6666.2703  RESTRAINT  =        0.4545
+ EAMBER  =   -93667.5077
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+    500      -9.3859E+04     6.3070E-01     3.8975E+01     CD       2092
+
+ BOND    =     6458.8070  ANGLE   =      371.1982  DIHED      =      724.8620
+ VDWAALS =    12514.0927  EEL     =  -121057.0547  HBOND      =        0.0000
+ 1-4 VDW =      462.4272  1-4 EEL =     6666.0090  RESTRAINT  =        0.4879
+ EAMBER  =   -93859.6586
+
+
+  Maximum number of minimization cycles reached.
+
+
+                    FINAL RESULTS
+
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+    500      -9.3859E+04     6.3070E-01     3.8975E+01     CD       2092
+
+ BOND    =     6458.8070  ANGLE   =      371.1982  DIHED      =      724.8620
+ VDWAALS =    12514.0927  EEL     =  -121057.0547  HBOND      =        0.0000
+ 1-4 VDW =      462.4272  1-4 EEL =     6666.0090  RESTRAINT  =        0.4879
+ EAMBER  =   -93859.6586
+
+--------------------------------------------------------------------------------
+   5.  TIMINGS
+--------------------------------------------------------------------------------
+
+|    Read coords time           0.04 ( 0.06% of Total)
+|                Build the list             0.24 (61.44% of List )
+|                Other                      0.15 (38.56% of List )
+|             List time                  0.40 ( 1.21% of Nonbo)
+|                   Short_ene time            23.40 (95.20% of Direc)
+|                   Other                      1.18 ( 4.80% of Direc)
+|                Direct Ewald time         24.58 (76.14% of Ewald)
+|                Adjust Ewald time          0.27 ( 0.83% of Ewald)
+|                Self Ewald time            0.01 ( 0.03% of Ewald)
+|                   Fill Bspline coeffs        0.61 ( 9.25% of Recip)
+|                   Fill charge grid           0.68 (10.34% of Recip)
+|                   Scalar sum                 0.63 ( 9.53% of Recip)
+|                   Grad sum                   1.67 (25.39% of Recip)
+|                      FFT back comm time         0.68 (24.65% of FFT t)
+|                      Other                      2.08 (75.35% of FFT t)
+|                   FFT time                   2.76 (42.06% of Recip)
+|                   Other                      0.23 ( 3.44% of Recip)
+|                Recip Ewald time           6.56 (20.33% of Ewald)
+|                Force Adjust               0.63 ( 1.95% of Ewald)
+|                Virial junk                0.14 ( 0.44% of Ewald)
+|                Start synchronizatio       0.01 ( 0.02% of Ewald)
+|                Other                      0.08 ( 0.26% of Ewald)
+|             Ewald time                32.29 (98.68% of Nonbo)
+|             IPS excludes               0.01 ( 0.02% of Nonbo)
+|             Other                      0.03 ( 0.09% of Nonbo)
+|          Nonbond force             32.72 (91.70% of Force)
+|          Bond/Angle/Dihedral        0.40 ( 1.11% of Force)
+|          FRC Collect time           0.63 ( 1.77% of Force)
+|          Other                      1.93 ( 5.42% of Force)
+|       Force time                35.68 (100.0% of Runmd)
+|    Runmd Time                35.68 (63.56% of Total)
+|    Other                     20.42 (36.38% of Total)
+| Total time                56.14 (100.0% of ALL  )
+
+| Highest rstack allocated:     422690
+| Highest istack allocated:       9624
+|           Job began  at 12:48:23.706  on 02/24/2020
+|           Setup done at 12:48:24.217  on 02/24/2020
+|           Run   done at 12:49:19.850  on 02/24/2020
+|     wallclock() was called   22060 times

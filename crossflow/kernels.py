@@ -111,52 +111,54 @@ class SubprocessKernel(object):
         """
         outputs = []
         td = tempfile.mkdtemp()
-        with Path(td) as tmpdir:
-            var_dict = {}
-            for i in range(len(args)):
-                if self.inputs[i] in self.variables:
-                    var_dict[self.inputs[i]] = args[i]
+        var_dict = {}
+        for i in range(len(args)):
+            if self.inputs[i] in self.variables:
+                var_dict[self.inputs[i]] = args[i]
+            else:
+                if isinstance(args[i], list):
+                    fnames = _gen_filenames(self.inputs[i], len(args[i]))
+                    for j, f in enumerate(args[i]):
+                        f.save(op.join(td, fnames[j]))
                 else:
-                    if isinstance(args[i], list):
-                        fnames = _gen_filenames(self.inputs[i], len(args[i]))
-                        for j, f in enumerate(args[i]):
-                            f.save(fnames[j])
-                    else:
-                        try:
-                            args[i].save(self.inputs[i])
-                        except AttributeError:
-                            raise TypeError('Error: cannot process kernel argument {} {}'.format(i, args[i]))
-            for d in self.constants:
-                try:
-                    d['value'].save(d['name'])
-                except AttributeError:
-                    var_dict[d['name']] = d['value']
-            cmd = self.template.format(**var_dict)
+                    try:
+                        args[i].save(op.join(td, self.inputs[i]))
+                    except AttributeError:
+                        raise TypeError('Error: cannot process kernel argument {} {}'.format(i, args[i]))
+        for d in self.constants:
             try:
-                result = subprocess.run(cmd, shell=True,
-                                        stdout=subprocess.PIPE,
-                                        stderr=subprocess.PIPE,
-                                        check=True)
-            except subprocess.CalledProcessError as e:
-                result = CalledProcessError(e)
-                if not DEBUGINFO in self.outputs:
-                    raise result
+                d['value'].save(op.join(td, d['name']))
+            except AttributeError:
+                var_dict[d['name']] = d['value']
+        cmd = self.template.format(**var_dict)
+        try:
+            result = subprocess.run(cmd, shell=True,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE,
+                                    cwd=td,
+                                    check=True)
+        except subprocess.CalledProcessError as e:
+            result = CalledProcessError(e)
+            if not DEBUGINFO in self.outputs:
+                raise result
 
-            self.STDOUT = result.stdout.decode()
-            for outfile in self.outputs:
-                if '*' in outfile or '?' in outfile:
-                    outf = glob.glob(outfile)
-                    outf.sort()
-                    outputs.append([self.filehandler.load(f) for f in outf])
+        self.STDOUT = result.stdout.decode()
+        for outfile in self.outputs:
+            if not outfile in [STDOUT, DEBUGINFO]:
+                outfile = op.join(td, outfile)
+            if '*' in outfile or '?' in outfile:
+                outf = glob.glob(outfile)
+                outf.sort()
+                outputs.append([self.filehandler.load(f) for f in outf])
+            else:
+                if op.exists(outfile):
+                    outputs.append(self.filehandler.load(outfile))
+                elif outfile == STDOUT:
+                    outputs.append(self.STDOUT)
+                elif outfile == DEBUGINFO:
+                    outputs.append(result)
                 else:
-                    if op.exists(outfile):
-                        outputs.append(self.filehandler.load(outfile))
-                    elif outfile == STDOUT:
-                        outputs.append(self.STDOUT)
-                    elif outfile == DEBUGINFO:
-                        outputs.append(result)
-                    else:
-                        outputs.append(None)
+                    outputs.append(None)
         try:
             shutil.rmtree(td)
         except:

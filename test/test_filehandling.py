@@ -13,6 +13,7 @@ def test_data_protocol(tmpdir):
     q = d.join("hello2.txt")
     ql = l.save(q)
     assert q.read() == p.read()
+    assert l.read_text() == 'content'
 
 def test_file_protocol(tmpdir):
     d = tmpdir.mkdir('sub')
@@ -23,6 +24,7 @@ def test_file_protocol(tmpdir):
     q = d.join("hello2.txt")
     ql = l.save(q)
     assert q.read() == p.read()
+    assert l.read_text() == 'content'
 
 def test_s3_protocol(tmpdir):
     d = tmpdir.mkdir('sub')
@@ -33,4 +35,5 @@ def test_s3_protocol(tmpdir):
     q = d.join("hello2.txt")
     ql = l.save(q)
     assert q.read() == p.read()
+    assert l.read_text() == 'content'
 

@@ -43,7 +43,7 @@ class Client(object):
         """
         The close() method of the underlying dask client
         """
-        return self.client.close
+        return self.client.close()
 
     def upload(self, some_object):
         """

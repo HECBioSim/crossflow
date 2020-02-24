@@ -9,6 +9,7 @@ import zlib
 import os.path as op
 import uuid
 import fsspec
+import tempfile
 
 '''
 This module defines classes to handle files in distributed environments
@@ -23,9 +24,10 @@ and have a save() method that creates a local copy of that file:
 
     filename_here = fh.save(filename_here)
 
-and also an as_file() method which returns a path that points at a (maybe temporary) copy of the file contents, suitable for use in cases where a function requires a filename:
+they inherit from os.PathLike so can be used anywhere a conventional path can
+be used:
 
-    with open(fh.as_file()) as f:
+    with open(fh) as f:
         ...
 
 '''
@@ -36,7 +38,8 @@ class FileHandler(object):
     def load(self, path):
         return FileHandle(path, self.stage_point)
 
-class FileHandle(object):
+class FileHandle(os.PathLike):
+
     '''
     A portable container for a file.
     '''
@@ -60,7 +63,7 @@ class FileHandle(object):
             self.store.mode = 'rb'
    
     def __str__(self):
-        return "Filehandle for file {} at {}".format(self.path, self.staging_path)
+        return self.__fspath__()
 
     def save(self, path):
         """
@@ -73,7 +76,6 @@ class FileHandle(object):
             str: the path
         """
         source = self.store
-        #source.mode = 'rb'
         dest = fsspec.open(path, 'wb')
         if self.staging_path is None:
             with dest as d:
@@ -85,10 +87,24 @@ class FileHandle(object):
         dest.close()
         return path
             
-    def as_file(self):
+    def __fspath__(self):
         """
         Returns a path on the current local file system which points at the file
         """
-        dest = os.path.join(os.environ['TMPDIR'], self.uid)
-        return self.save(dest)
+        dest = os.path.join(tempfile.gettempdir(), self.uid)
+        if not op.exists(dest):
+            return self.save(dest)
+        else:
+            return dest
 
+    def read_binary(self):
+        source = self.store
+        if self.staging_path is None:
+            data = zlib.decompress(source)
+        else:
+            with source as s:
+                data = s.read()
+        return data
+
+    def read_text(self):
+        return self.read_binary().decode()
