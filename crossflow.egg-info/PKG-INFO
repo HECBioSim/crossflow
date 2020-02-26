@@ -1,12 +1,26 @@
 Metadata-Version: 1.1
 Name: crossflow
-Version: 0.0.2
+Version: 0.0.3
 Summary: A Python workflows system
 Home-page: UNKNOWN
 Author: Charlie Laughton
 Author-email: charles.laughton@nottingham.ac.uk
 License: MIT license.
-Description: A Python-oriented workflow system targetted at distributed computing infrastructures
+Description: # Crossflow
+        
+        A Python-based workflow system.
+        
+        Crossflow allows you to build and execute complex workflows that chain together 
+        command-line driven tools.
+        
+        For details, see the [Wiki](https://bitbucket.org/claughton/crossflow/wiki/Home).
+        
+        ### Authors:
+        
+        Charlie Laughton [charles.laughton@nottingham.ac.uk](mailto:charles.laughton@nottingham.ac.uk)
+        
+        Christian Suess [christian.suess@nottingham.ac.uk](mailto:christian.suess@nottingham.ac.uk)
+        
 Platform: UNKNOWN
 Classifier: Development Status :: 3 - Alpha
 Classifier: Intended Audience :: Science/Research

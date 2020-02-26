@@ -72,7 +72,7 @@ setup_args = {
     'name':             "crossflow",
     'version':          verstr,
     'description':      "A Python workflows system",
-    'long_description': "A Python-oriented workflow system targetted at distributed computing infrastructures",
+    'long_description': read('README.md'),
     'author':           "Charlie Laughton",
     'author_email':     "charles.laughton@nottingham.ac.uk",
     'url':              "",
@@ -104,7 +104,6 @@ setup_args = {
                 'dask',
                 'distributed',
                 'fsspec',
-                'path.py',
                ],
 
     'zip_safe': False,

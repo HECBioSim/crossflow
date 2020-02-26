@@ -4,9 +4,13 @@ Clients.py: thin wrapper over dask client
 import socket
 import subprocess
 import tempfile
+import glob
+from collections import Iterable
 from dask.distributed import Client as DaskClient
 from dask.distributed import LocalCluster
 from .kernels import FunctionKernel, SubprocessKernel
+from .filehandling import FileHandler, FileHandle
+from . import config
 
 def dask_client(scheduler_file=None, local=False, port=8786):
     """
@@ -38,6 +42,7 @@ class Client(object):
     '''
     def __init__(self, **kwargs):
         self.client = dask_client(**kwargs)
+        self.filehandler = FileHandler(config.stage_point)
 
     def close(self):
         """
@@ -55,6 +60,10 @@ class Client(object):
         returns:
             dask.Future
         """
+        try:
+            some_object = self.filehandler.load(some_object)
+        except:
+            pass
         return self.client.scatter(some_object, broadcast=True)
 
     def unpack(self, kernel, future):
@@ -79,6 +88,83 @@ class Client(object):
             outputs.append(self.client.submit(lambda tup, j: tup[j], future, i))
         return tuple(outputs)
 
+    def _filehandlify(self, args):
+        """
+        work through an argument list, converting paths to filehandles
+        where possible.
+        """
+        if isinstance(args, list):
+            newargs = []
+            for a in args:
+                if isinstance(a, list):
+                    newa = []
+                    for b in a:
+                        if isinstance(b, Iterable):
+                            if '?' in b or '*' in b:
+                                blist = glob.glob(b)
+                                blist.sort()
+                                if len(blist) > 0:
+                                    newb = []
+                                    for c in blist:
+                                        try:
+                                            c = self.filehandler.load(c)
+                                        except:
+                                            pass
+                                        newb.append(c)
+                                else:
+                                    try:
+                                        newb = self.filehandler.load(b)
+                                    except:
+                                        newb = b
+                            else:
+                                try:
+                                    newb = self.filehandler.load(b)
+                                except:
+                                    newb = b
+                        else:
+                            try:
+                                newb = self.filehandler.load(b)
+                            except:
+                                newb = b
+
+                        newa.append(newb)
+                else:
+                    if isinstance(a, Iterable):
+                        if '?' in a or '*' in a:
+                            alist = glob.glob(a)
+                            alist.sort()
+                            if len(alist) > 0:
+                                newa = []
+                                for c in alist:
+                                    try:
+                                        c = self.filehandler.load(c)
+                                    except:
+                                        pass
+                                    newa.append(c)
+                            else:
+                                try:
+                                    newa = self.filehandler.load(a)
+                                except:
+                                    newa = a
+                        else:
+                            try:
+                                newa = self.filehandler.load(a)
+                            except:
+                                newa = a
+                    else:
+                        try:
+                            newa = self.filehandler.load(a)
+                        except:
+                            newa = a
+                newargs.append(newa)
+        else:
+            newargs = args
+            try:
+                newargs = self.filehandler.load(newargs)
+            except:
+                pass
+        return newargs
+
     def submit(self, func, *args):
         """
         Wrapper round the dask submit() method, so that a tuple of
@@ -90,11 +176,12 @@ class Client(object):
         returns:
             future or tuple of futures
         """
+        newargs = self._filehandlify(args)
         if isinstance(func, SubprocessKernel):
-            future = self.client.submit(func.run, *args, pure=False)
+            future = self.client.submit(func.run, *newargs, pure=False)
             return self.unpack(func, future)
         if isinstance(func, FunctionKernel):
-            future = self.client.submit(func.run, *args, pure=False)
+            future = self.client.submit(func.run, *newargs, pure=False)
             return self.unpack(func, future)
         else:
             return self.client.submit(func, *args)
@@ -133,11 +220,12 @@ class Client(object):
                 its.append(iterable)
             else:
                 its.append([iterable] * maxlen)
+        newits = self._filehandlify(its)
         if isinstance(func, SubprocessKernel):
-            futures = self.client.map(func.run, *its, pure=False)
+            futures = self.client.map(func.run, *newits, pure=False)
             result = [self.unpack(func, future) for future in futures]
         elif isinstance(func, FunctionKernel):
-            futures = self.client.map(func.run, *its, pure=False)
+            futures = self.client.map(func.run, *newits, pure=False)
             result = [self.unpack(func, future) for future in futures]
         else:
             result =  self.client.map(func, *its, pure=False)

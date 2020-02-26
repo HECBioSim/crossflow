@@ -6,7 +6,7 @@
 # A large text file is split into a number of separate ones, each of these
 # has its lines reversed (last to first), and then the chunks are recombined.
 #
-from crossflow import clients, kernels, filehandling
+from crossflow import clients, kernels
 from pathlib import Path
 
 def run(client):
@@ -28,12 +28,9 @@ def run(client):
     joiner = kernels.SubprocessKernel('cat * > output')
     joiner.set_inputs(['*'])
     joiner.set_outputs(['output'])
-    # Convert the input datafiles into Crossflow FileHandle objects:
-    fh = filehandling.FileHandler()
-    input_data = fh.load(input_file)
     # Here is the workflow, using .submit() and .map() methods.
     # First split the file into pieces:
-    pieces = client.submit(splitter, input_data)
+    pieces = client.submit(splitter, input_file)
     # 'pieces' is a tuple, convert to a list and process each
     # piece in parallel:
     reversed_pieces = client.map(reverser, list(pieces))

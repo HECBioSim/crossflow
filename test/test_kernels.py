@@ -4,6 +4,15 @@ import os.path as op
 import os
 import pytest
 
+def test_subprocess_kernel_no_filehandles(tmpdir):
+    sk = kernels.SubprocessKernel('cat file.txt')
+    sk.set_inputs(['file.txt'])
+    sk.set_outputs([kernels.STDOUT])
+    p = tmpdir.mkdir('sub').join("hello.txt")
+    p.write("content")
+    result = sk.run(p)
+    assert result == 'content'
+
 def test_subprocess_kernel_stdout(tmpdir):
     sk = kernels.SubprocessKernel('cat file.txt')
     sk.set_inputs(['file.txt'])
@@ -75,3 +84,36 @@ def test_function_kernel_basic():
     fk.set_outputs(['ab'])
     result = fk.run(3, 4)
     assert result == 12
+
+def test_function_kernel_with_filehandles(tmpdir):
+    d = tmpdir.mkdir('sub')
+    p = d.join("lines.txt")
+    p.write("line 1\nline 2\nline 3\n")
+    fh = filehandling.FileHandler()
+    l = fh.load(p)
+
+    def linecount(a):
+        with open(a) as f:
+            lines = f.readlines()
+        return len(lines)
+
+    fk = kernels.FunctionKernel(linecount)
+    fk.set_inputs(['a'])
+    fk.set_outputs(['nlines'])
+    result = fk.run(l)
+    assert result == 3
+
+def test_function_kernel_no_filehandles(tmpdir):
+    d = tmpdir.mkdir('sub')
+    p = d.join("lines.txt")
+    p.write("line 1\nline 2\nline 3\n")
+    def linecount(a):
+        with open(a) as f:
+            lines = f.readlines()
+        return len(lines)
+
+    fk = kernels.FunctionKernel(linecount)
+    fk.set_inputs(['a'])
+    fk.set_outputs(['nlines'])
+    result = fk.run(p)
+    assert result == 3

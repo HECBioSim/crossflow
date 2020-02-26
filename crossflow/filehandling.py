@@ -10,6 +10,7 @@ import os.path as op
 import uuid
 import fsspec
 import tempfile
+from . import config
 
 '''
 This module defines classes to handle files in distributed environments
@@ -31,9 +32,16 @@ be used:
         ...
 
 '''
+
+def set_stage_point(stage_point):
+    config.stage_point = stage_point
+
 class FileHandler(object):
     def __init__(self, stage_point=None):
-        self.stage_point = stage_point
+        if stage_point is None:
+            self.stage_point = config.stage_point
+        else: 
+            self.stage_point = stage_point
 
     def load(self, path):
         return FileHandle(path, self.stage_point)

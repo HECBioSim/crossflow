@@ -6,6 +6,7 @@ setup.py
 crossflow/__init__.py
 crossflow/_version.py
 crossflow/clients.py
+crossflow/config.py
 crossflow/filehandling.py
 crossflow/kernels.py
 crossflow.egg-info/PKG-INFO

@@ -6,7 +6,7 @@
 # the associated client, this part of the process must be done in
 # __main__
 #
-from crossflow import clients, kernels, filehandling
+from crossflow import clients, kernels
 from pathlib import Path
 
 def run(client):
@@ -20,13 +20,9 @@ def run(client):
     joiner = kernels.SubprocessKernel('cat * > output')
     joiner.set_inputs(['*'])
     joiner.set_outputs(['output'])
-    # Convert the input datafiles into Crossflow FileHandle objects:
-    fh = filehandling.FileHandler()
-    in1 = fh.load(input_file1)
-    in2 = fh.load(input_file2)
     # The kernel expects an arbitrary number of input files, so put the inputs
     # into a list:
-    inputs = [in1, in2]
+    inputs = [input_file1, input_file2]
     # Send the job to the client via the submit() method:
     output = client.submit(joiner, inputs) 
     # The client returns outputs as Futures, so call their result() method

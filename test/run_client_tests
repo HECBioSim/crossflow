@@ -23,6 +23,21 @@ def test_function_kernel(myclient, tmpdir):
         print('Error: result.result() = {}'.format(result.result()))
         raise
 
+def test_function_kernel_no_filehandler(myclient, tmpdir):
+    def testit(f):
+        return f
+    fk = kernels.FunctionKernel(testit)
+    fk.set_inputs(['f'])
+    fk.set_outputs(['x'])
+    p = tmpdir / "hello.txt"
+    p.write_text("content")
+    result = myclient.submit(fk, p)
+    try:
+        assert isinstance(result.result(), filehandling.FileHandle)
+    except AssertionError:
+        print('Error: result.result() = {}'.format(result.result()))
+        raise
+
 def test_subprocess_kernel_data(myclient, tmpdir):
     sk = kernels.SubprocessKernel('cat file.txt')
     sk.set_inputs(['file.txt'])
@@ -33,6 +48,18 @@ def test_subprocess_kernel_data(myclient, tmpdir):
     l = fh.load(p)
     ll = myclient.upload(l)
     result = myclient.submit(sk, ll)
+    try:
+        assert result.result() == 'content'
+    except AssertionError:
+        print('Error: result.result() = {}'.format(result.result()))
+
+def test_subprocess_kernel_no_filehandler(myclient, tmpdir):
+    sk = kernels.SubprocessKernel('cat file.txt')
+    sk.set_inputs(['file.txt'])
+    sk.set_outputs([kernels.STDOUT])
+    p = tmpdir / "hello.txt"
+    p.write_text("content")
+    result = myclient.submit(sk, p)
     try:
         assert result.result() == 'content'
     except AssertionError:
@@ -73,7 +100,9 @@ if __name__ == '__main__':
     myclient = clients.Client(local=True)
     tmpdir = Path(tempfile.mkdtemp())
     test_function_kernel(myclient, tmpdir)
+    test_function_kernel_no_filehandler(myclient, tmpdir)
     test_subprocess_kernel_data(myclient, tmpdir)
+    test_subprocess_kernel_no_filehandler(myclient, tmpdir)
     test_subprocess_kernel_file(myclient, tmpdir)
     test_subprocess_kernel_s3(myclient, tmpdir)
     myclient.close()

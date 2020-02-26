@@ -1,3 +1,4 @@
+import crossflow
 from crossflow import filehandling
 import tempfile
 import os.path as op
@@ -15,6 +16,11 @@ def test_data_protocol(tmpdir):
     assert q.read() == p.read()
     assert l.read_text() == 'content'
 
+def test_config(tmpdir):
+    crossflow.set_stage_point(tmpdir)
+    fh = filehandling.FileHandler()
+    assert fh.stage_point == tmpdir
+    
 def test_file_protocol(tmpdir):
     d = tmpdir.mkdir('sub')
     p = d.join("hello.txt")

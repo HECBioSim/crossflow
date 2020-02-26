@@ -9,11 +9,10 @@ import tempfile
 import shutil
 import copy
 import glob
-import numpy as np
-from path import Path
+from math import log10
 from .filehandling import FileHandler, FileHandle
+from . import config
 
-filehandler = FileHandler()
 STDOUT = "STDOUT"
 DEBUGINFO = "DEBUGINFO"
 
@@ -23,7 +22,7 @@ def _gen_filenames(pattern, n_files):
     '''
     if not '?' in pattern and not '*' in pattern:
         raise ValueError('Error - the pattern must contain * or ?')
-    l = int(np.log10(n_files)) + 1
+    l = int(log10(n_files)) + 1
     if '*' in pattern:
         w = pattern.split('*')
         template = '{}{{:0{}d}}{}'.format(w[0], l, w[1])
@@ -49,7 +48,7 @@ class SubprocessKernel(object):
         self.outputs = []
         self.constants = []
         self.STDOUT = None
-        self.filehandler = filehandler
+        self.filehandler = FileHandler(config.stage_point)
 
         self.variables = []
         for key in re.findall(r'\{.*?\}', self.template):
@@ -81,12 +80,9 @@ class SubprocessKernel(object):
         """
         d = {}
         d['name'] = key
-        if isinstance(value, str):
-            if os.path.exists(value):
-                d['value'] = self.filehandler.load(value)
-            else:
-                d['value'] = value
-        else:
+        try:
+            d['value'] = self.filehandler.load(value)
+        except: 
             d['value'] = value
         self.constants.append(d)
 
@@ -119,10 +115,19 @@ class SubprocessKernel(object):
                 if isinstance(args[i], list):
                     fnames = _gen_filenames(self.inputs[i], len(args[i]))
                     for j, f in enumerate(args[i]):
+                        try:
+                            f = self.filehandler.load(f)
+                        except:
+                            pass
                         f.save(op.join(td, fnames[j]))
                 else:
+                    f = args[i]
                     try:
-                        args[i].save(op.join(td, self.inputs[i]))
+                        f = self.filehandler.load(f)
+                    except:
+                        pass
+                    try:
+                        f.save(op.join(td, self.inputs[i]))
                     except AttributeError:
                         raise TypeError('Error: cannot process kernel argument {} {}'.format(i, args[i]))
         for d in self.constants:
@@ -181,7 +186,7 @@ class FunctionKernel(object):
         self.outputs = []
         self.constants = {}
         self.tmpdir = None
-        self.filehandler = filehandler
+        self.filehandler = FileHandler(config.stage_point)
 
     def set_inputs(self, inputs):
         """
@@ -199,10 +204,10 @@ class FunctionKernel(object):
         """
         Set a parameters for the kernel
         """
-        self.constants[key] = value
-        if isinstance(value, str):
-            if os.path.exists(value):
-                self.constants[key] = self.filehandler.load(value)
+        try:
+            self.constants[key] = self.filehandler.load(value)
+        except:
+            self.constants[key] = value
 
     def copy(self):
         """
@@ -219,38 +224,47 @@ class FunctionKernel(object):
                 to FileHandle objects
         """
         td = tempfile.mkdtemp()
-        with Path(td) as tmpdir:
-            indict = {}
-            for i, v in enumerate(args):
-                if isinstance(v, dict):
-                    for k in v:
-                        if k in self.inputs:
-                            try:
-                                indict[k] = v[k].save(os.path.basename(v[k].path))
-                            except AttributeError:
-                                indict[k] = v[k]
-                else:
-                    try:
-                        indict[self.inputs[i]] = v.save(os.path.basename(v.path))
-                    except AttributeError:
-                        indict[self.inputs[i]] = v
-            for k in self.constants:
+        os.chdir(td)
+        indict = {}
+        for i, v in enumerate(args):
+            if isinstance(v, dict):
+                for k in v:
+                    if k in self.inputs:
+                        f = v[k]
+                        try:
+                            f = self.filehandler.load(f)
+                        except:
+                            pass
+                        try:
+                            indict[k] = f.save(os.path.basename(v[k].path))
+                        except AttributeError:
+                            indict[k] = f
+            else:
                 try:
-                    indict[k] = self.constants[k].save(os.path.basename(self.constants[k].path))
+                    v = self.filehandler.load(v)
+                except:
+                    pass
+                try:
+                    indict[self.inputs[i]] = v.save(os.path.basename(v.path))
                 except AttributeError:
-                    indict[k] = self.constants[k]
-            result = self.func(**indict)
-            if not isinstance(result, list):
-                result = [result]
-            outputs = []
-            for i, v in enumerate(result):
-                if isinstance(v, str):
-                    if os.path.exists(v):
-                        outputs.append(self.filehandler.load(v))
-                    else:
-                        outputs.append(v)
+                    indict[self.inputs[i]] = v
+        for k in self.constants:
+            try:
+                indict[k] = self.constants[k].save(os.path.basename(self.constants[k].path))
+            except AttributeError:
+                indict[k] = self.constants[k]
+        result = self.func(**indict)
+        if not isinstance(result, list):
+            result = [result]
+        outputs = []
+        for i, v in enumerate(result):
+            if isinstance(v, str):
+                if os.path.exists(v):
+                    outputs.append(self.filehandler.load(v))
                 else:
                     outputs.append(v)
+            else:
+                outputs.append(v)
         try:
             shutil.rmtree(td)
         except:
