@@ -2,4 +2,5 @@
 pip install cython
 pip install mdtraj
 pip install pinda
-pinda install ambertools 18
+pinda update
+pinda install amber 18
