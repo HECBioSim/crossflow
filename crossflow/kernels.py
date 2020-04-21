@@ -129,7 +129,7 @@ class SubprocessKernel(object):
                     try:
                         f.save(op.join(td, self.inputs[i]))
                     except AttributeError:
-                        raise TypeError('Error: cannot process kernel argument {} {}'.format(i, args[i]))
+                        raise TypeError('Error: cannot process kernel argument {} {} type {}'.format(i, args[i], type(args[i])))
         for d in self.constants:
             try:
                 d['value'].save(op.join(td, d['name']))
