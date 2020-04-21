@@ -46,7 +46,7 @@ class FileHandler(object):
     def load(self, path):
         return FileHandle(path, self.stage_point)
 
-class FileHandle(os.PathLike):
+class FileHandle(object):
 
     '''
     A portable container for a file.
