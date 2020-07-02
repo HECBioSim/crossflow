@@ -12,11 +12,11 @@ from .kernels import FunctionKernel, SubprocessKernel
 from .filehandling import FileHandler, FileHandle
 from . import config
 
-def dask_client(scheduler_file=None, local=False, port=8786):
+def dask_client(address=None, scheduler_file=None):
     """
     returns an instance of a dask.distributed client
     """
-    if local:
+    if address is None and scheduler_file is None:
 #        if __name__ == '__main__':
             workdir = tempfile.mkdtemp()
             cluster = LocalCluster(local_directory=workdir)
@@ -27,10 +27,8 @@ def dask_client(scheduler_file=None, local=False, port=8786):
     elif scheduler_file:
         client = DaskClient(scheduler_file=scheduler_file)
     else:
-        ip_address = socket.gethostbyname(socket.gethostname())
-        dask_scheduler = '{}:{}'.format(ip_address, port)
         try:
-            client = DaskClient(dask_scheduler, timeout=5)
+            client = DaskClient(address, timeout=5)
         except IOError:
             print('Error: cannot connect to dask scheduler at {}'.format(dask_scheduler))
             raise
