@@ -21,6 +21,17 @@ def test_config(tmpdir):
     fh = filehandling.FileHandler()
     assert fh.stage_point == tmpdir
     
+def test_cleanup(tmpdir):
+    d = tmpdir.mkdir('sub')
+    p = d.join("hello.txt")
+    p.write("content")
+    fh = filehandling.FileHandler()
+    l = fh.load(p)
+    tmppath = str(l)
+    assert op.exists(tmppath)
+    del(l)
+    assert not op.exists(tmppath)
+    
 def test_file_protocol(tmpdir):
     d = tmpdir.mkdir('sub')
     p = d.join("hello.txt")

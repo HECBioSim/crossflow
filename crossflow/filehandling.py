@@ -56,6 +56,7 @@ class FileHandle(object):
         ext = os.path.splitext(path)[1]
         self.path = path
         self.uid = str(uuid.uuid4()) + ext
+        self.local_path = None
         if stage_point is None:
             self.staging_path = None
             with source as s:
@@ -99,11 +100,19 @@ class FileHandle(object):
         """
         Returns a path on the current local file system which points at the file
         """
-        dest = os.path.join(tempfile.gettempdir(), self.uid)
-        if not op.exists(dest):
-            return self.save(dest)
+        if self.local_path is None:
+            self.local_path = os.path.join(tempfile.gettempdir(), self.uid)
+        if not op.exists(self.local_path):
+            return self.save(self.local_path)
         else:
-            return dest
+            return self.local_path
+
+    def __del__(self):
+        if self.local_path is not None:
+            try:
+                os.remove(self.local_path)
+            except:
+                pass
 
     def read_binary(self):
         source = self.store
