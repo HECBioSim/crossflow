@@ -6,40 +6,17 @@ import subprocess
 import tempfile
 import glob
 from collections import Iterable
-from dask.distributed import Client as DaskClient
-from dask.distributed import LocalCluster
 from .kernels import FunctionKernel, SubprocessKernel
 from .filehandling import FileHandler, FileHandle
 from . import config
 
-def dask_client(address=None, scheduler_file=None):
-    """
-    returns an instance of a dask.distributed client
-    """
-    if address is None and scheduler_file is None:
-#        if __name__ == '__main__':
-            workdir = tempfile.mkdtemp()
-            cluster = LocalCluster(local_directory=workdir)
-            client = DaskClient(cluster)
-#        else:
-#            raise IOError('Error: local cluster must be started within the __main__ block of the script not from {}'.format(__name__))
-
-    elif scheduler_file:
-        client = DaskClient(scheduler_file=scheduler_file)
-    else:
-        try:
-            client = DaskClient(address, timeout=5)
-        except IOError:
-            print('Error: cannot connect to dask scheduler at {}'.format(dask_scheduler))
-            raise
-    return client
 
 class Client(object):
     '''Thin wrapper around Dask client so functions that return multiple
        values (tuples) generate tuples of futures rather than single futures.
     '''
-    def __init__(self, **kwargs):
-        self.client = dask_client(**kwargs)
+    def __init__(self, dask_client):
+        self.client = dask_client
         self.filehandler = FileHandler(config.stage_point)
 
     def close(self):

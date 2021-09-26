@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 from crossflow import filehandling, kernels, clients
+from distributed import Client as DaskClient
 import tempfile
 from pathlib import Path
 import os.path as op
 import os
-
 
 def test_function_kernel(myclient, tmpdir):
     def testit(f):
@@ -97,7 +97,8 @@ def test_subprocess_kernel_s3(myclient, tmpdir):
 
 
 if __name__ == '__main__':
-    myclient = clients.Client()
+    dask_client = DaskClient()
+    myclient = clients.Client(dask_client)
     tmpdir = Path(tempfile.mkdtemp())
     test_function_kernel(myclient, tmpdir)
     test_function_kernel_no_filehandler(myclient, tmpdir)

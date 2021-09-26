@@ -115,21 +115,14 @@ class SubprocessKernel(object):
                 if isinstance(args[i], list):
                     fnames = _gen_filenames(self.inputs[i], len(args[i]))
                     for j, f in enumerate(args[i]):
-                        try:
+                        if not hasattr(f, 'save'):
                             f = self.filehandler.load(f)
-                        except:
-                            pass
                         f.save(op.join(td, fnames[j]))
                 else:
                     f = args[i]
-                    try:
+                    if not hasattr(f, 'save'):
                         f = self.filehandler.load(f)
-                    except:
-                        pass
-                    try:
-                        f.save(op.join(td, self.inputs[i]))
-                    except AttributeError:
-                        raise TypeError('Error: cannot process kernel argument {} {} type {}'.format(i, args[i], type(args[i])))
+                    f.save(op.join(td, self.inputs[i]))
         for d in self.constants:
             try:
                 d['value'].save(op.join(td, d['name']))
