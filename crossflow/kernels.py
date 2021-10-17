@@ -1,6 +1,6 @@
-'''
+"""
 Xflowlib: the Xflow library to build workflows on an Xbow cluster
-'''
+"""
 import re
 import subprocess
 import os
@@ -10,34 +10,37 @@ import shutil
 import copy
 import glob
 from math import log10
-from .filehandling import FileHandler, FileHandle
+from .filehandling import FileHandler
 from . import config
 
 STDOUT = "STDOUT"
 DEBUGINFO = "DEBUGINFO"
 
+
 def _gen_filenames(pattern, n_files):
-    '''
+    """
     Generate a list of filenames consistent with a pattern.
-    '''
-    if not '?' in pattern and not '*' in pattern:
+    """
+    if '?' not in pattern and '*' not in pattern:
         raise ValueError('Error - the pattern must contain * or ?')
-    l = int(log10(n_files)) + 1
+    fieldwidth = int(log10(n_files)) + 1
     if '*' in pattern:
         w = pattern.split('*')
-        template = '{}{{:0{}d}}{}'.format(w[0], l, w[1])
+        template = '{}{{:0{}d}}{}'.format(w[0], fieldwidth, w[1])
     else:
         w = pattern.split('?')
-        if pattern.count('?') < l:
+        if pattern.count('?') < fieldwidth:
             raise ValueError('Error - too many files for this pattern')
         template = '{}{{:0{}d}}{}'.format(w[0], pattern.count('?'), w[-1])
     filenames = [template.format(i) for i in range(n_files)]
     return filenames
-            
+
+
 class SubprocessKernel(object):
-    '''
+    """
     A kernel that runs a command-line executable
-    '''
+    """
+
     def __init__(self, template):
         """
         Arguments:
@@ -51,7 +54,7 @@ class SubprocessKernel(object):
         self.filehandler = FileHandler(config.stage_point)
 
         self.variables = []
-        for key in re.findall(r'\{.*?\}', self.template):
+        for key in re.findall(r'{.*?}', self.template):
             self.variables.append(key[1:-1])
 
     def set_inputs(self, inputs):
@@ -60,7 +63,7 @@ class SubprocessKernel(object):
         """
         if not isinstance(inputs, list):
             raise TypeError('Error - inputs must be of type list,'
-                    ' not of type {}'.format(type(inputs)))
+                            ' not of type {}'.format(type(inputs)))
         self.inputs = inputs
 
     def set_outputs(self, outputs):
@@ -69,7 +72,7 @@ class SubprocessKernel(object):
         """
         if not isinstance(outputs, list):
             raise TypeError('Error - outputs must be of type list,'
-                    ' not of type {}'.format(type(outputs)))
+                            ' not of type {}'.format(type(outputs)))
         self.outputs = outputs
 
     def set_constant(self, key, value):
@@ -78,11 +81,10 @@ class SubprocessKernel(object):
         If it was previously defined as an input variable, remove it from
         that list.
         """
-        d = {}
-        d['name'] = key
+        d = {'name': key}
         try:
             d['value'] = self.filehandler.load(value)
-        except: 
+        except IOError:
             d['value'] = value
         self.constants.append(d)
 
@@ -90,9 +92,9 @@ class SubprocessKernel(object):
             self.inputs.remove(key)
 
     def copy(self):
-        '''
+        """
         Return a copy of the kernel
-        '''
+        """
         return copy.deepcopy(self)
 
     def run(self, *args):
@@ -137,12 +139,12 @@ class SubprocessKernel(object):
                                     check=True)
         except subprocess.CalledProcessError as e:
             result = CalledProcessError(e)
-            if not DEBUGINFO in self.outputs:
+            if DEBUGINFO not in self.outputs:
                 raise result
 
         self.STDOUT = result.stdout.decode()
         for outfile in self.outputs:
-            if not outfile in [STDOUT, DEBUGINFO]:
+            if outfile not in [STDOUT, DEBUGINFO]:
                 outfile = op.join(td, outfile)
             if '*' in outfile or '?' in outfile:
                 outf = glob.glob(outfile)
@@ -157,22 +159,20 @@ class SubprocessKernel(object):
                     outputs.append(result)
                 else:
                     outputs.append(None)
-        try:
-            shutil.rmtree(td)
-        except:
-            pass
+        shutil.rmtree(td, ignore_errors=True)
+
         if len(outputs) == 1:
             outputs = outputs[0]
         else:
             outputs = tuple(outputs)
         return outputs
-     
+
+
 class FunctionKernel(object):
     def __init__(self, func):
         """
         Arguments:
             func: the Python function to wrap
-            filetype (FileHandle): the file-type handler
         """
         self.func = func
         self.inputs = []
@@ -199,7 +199,7 @@ class FunctionKernel(object):
         """
         try:
             self.constants[key] = self.filehandler.load(value)
-        except:
+        except IOError:
             self.constants[key] = value
 
     def copy(self):
@@ -226,7 +226,7 @@ class FunctionKernel(object):
                         f = v[k]
                         try:
                             f = self.filehandler.load(f)
-                        except:
+                        except IOError:
                             pass
                         try:
                             indict[k] = f.save(os.path.basename(v[k].path))
@@ -235,7 +235,7 @@ class FunctionKernel(object):
             else:
                 try:
                     v = self.filehandler.load(v)
-                except:
+                except IOError:
                     pass
                 try:
                     indict[self.inputs[i]] = v.save(os.path.basename(v.path))
@@ -258,21 +258,21 @@ class FunctionKernel(object):
                     outputs.append(v)
             else:
                 outputs.append(v)
-        try:
-            shutil.rmtree(td)
-        except:
-            pass
+            shutil.rmtree(td, ignore_errors=True)
+
         if len(outputs) == 1:
             outputs = outputs[0]
         else:
             outputs = tuple(outputs)
         return outputs
 
+
 class XflowError(Exception):
     """
     Base class for Crossflow exceptions.
     """
     pass
+
 
 class CalledProcessError(XflowError):
     """
@@ -289,4 +289,7 @@ class CalledProcessError(XflowError):
         self.output = self.stdout
 
     def __str__(self):
-        return 'Error: command "{}" failed with return code {}; STDOUT="{}"; STDERR="{}"'.format(self.cmd, self.returncode, self.stdout, self.stderr)
+        return 'Error: command "{}" failed with return code {}; STDOUT="{}"; STDERR="{}"'.format(self.cmd,
+                                                                                                 self.returncode,
+                                                                                                 self.stdout,
+                                                                                                 self.stderr)

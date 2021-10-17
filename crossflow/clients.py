@@ -1,20 +1,17 @@
-'''
+"""
 Clients.py: thin wrapper over dask client
-'''
-import socket
-import subprocess
-import tempfile
+"""
 import glob
 from collections import Iterable
 from .kernels import FunctionKernel, SubprocessKernel
-from .filehandling import FileHandler, FileHandle
+from .filehandling import FileHandler
 from . import config
 
 
 class Client(object):
-    '''Thin wrapper around Dask client so functions that return multiple
+    """Thin wrapper around Dask client so functions that return multiple
        values (tuples) generate tuples of futures rather than single futures.
-    '''
+    """
     def __init__(self, dask_client):
         self.client = dask_client
         self.filehandler = FileHandler(config.stage_point)
@@ -37,7 +34,7 @@ class Client(object):
         """
         try:
             some_object = self.filehandler.load(some_object)
-        except:
+        except IOError:
             pass
         return self.client.scatter(some_object, broadcast=True)
 
@@ -83,23 +80,23 @@ class Client(object):
                                     for c in blist:
                                         try:
                                             c = self.filehandler.load(c)
-                                        except:
+                                        except IOError:
                                             pass
                                         newb.append(c)
                                 else:
                                     try:
                                         newb = self.filehandler.load(b)
-                                    except:
+                                    except IOError:
                                         newb = b
                             else:
                                 try:
                                     newb = self.filehandler.load(b)
-                                except:
+                                except IOError:
                                     newb = b
                         else:
                             try:
                                 newb = self.filehandler.load(b)
-                            except:
+                            except IOError:
                                 newb = b
 
                         newa.append(newb)
@@ -113,30 +110,30 @@ class Client(object):
                                 for c in alist:
                                     try:
                                         c = self.filehandler.load(c)
-                                    except:
+                                    except IOError:
                                         pass
                                     newa.append(c)
                             else:
                                 try:
                                     newa = self.filehandler.load(a)
-                                except:
+                                except IOError:
                                     newa = a
                         else:
                             try:
                                 newa = self.filehandler.load(a)
-                            except:
+                            except IOError:
                                 newa = a
                     else:
                         try:
                             newa = self.filehandler.load(a)
-                        except:
+                        except IOError:
                             newa = a
                 newargs.append(newa)
         else:
             newargs = args
             try:
                 newargs = self.filehandler.load(newargs)
-            except:
+            except IOError:
                 pass
         return newargs
 
@@ -161,11 +158,11 @@ class Client(object):
         else:
             return self.client.submit(func, *args)
 
-    def _lt2tl(self, l):
-        '''converts a list of tuples to a tuple of lists'''
+    def _lt2tl(self, tuplist):
+        """converts a list of tuples to a tuple of lists"""
         result = []
-        for i in range(len(l[0])):
-            result.append([t[i] for t in l])
+        for i in range(len(tuplist[0])):
+            result.append([t[i] for t in tuplist])
         return tuple(result)
 
     def map(self, func, *iterables):
@@ -184,13 +181,13 @@ class Client(object):
         maxlen = 0
         for iterable in iterables:
             if isinstance(iterable, list):
-                l = len(iterable)
-                if l > maxlen:
-                    maxlen = l
+                n_items = len(iterable)
+                if n_items > maxlen:
+                    maxlen = n_items
         for iterable in iterables:
             if isinstance(iterable, list):
-                l = len(iterable)
-                if l != maxlen:
+                n_items = len(iterable)
+                if n_items != maxlen:
                     raise ValueError('Error: not all iterables are same length')
                 its.append(iterable)
             else:
@@ -203,7 +200,7 @@ class Client(object):
             futures = self.client.map(func.run, *newits, pure=False)
             result = [self.unpack(func, future) for future in futures]
         else:
-            result =  self.client.map(func, *its, pure=False)
+            result = self.client.map(func, *its, pure=False)
         if isinstance(result[0], tuple):
             result = self._lt2tl(result)
         return result

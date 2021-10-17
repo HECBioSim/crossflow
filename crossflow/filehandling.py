@@ -1,8 +1,8 @@
-'''
+"""
 filehanding.py: this module provides classes for passing files between
 processes on distributed computing platforms that may not share a common
 file system.
-'''
+"""
 
 import os
 import zlib
@@ -17,7 +17,7 @@ This module defines classes to handle files in distributed environments
 where filesyatems may not be shared.
 
 Objects of each class are instantiated with the path of an existing file on
-an existing file syatem:
+an existing file system:
 
     fh = FileHandle('/path/to/file')
 
@@ -30,27 +30,29 @@ be used:
 
     with open(fh) as f:
         ...
-
 '''
+
 
 def set_stage_point(stage_point):
     config.stage_point = stage_point
+
 
 class FileHandler(object):
     def __init__(self, stage_point=None):
         if stage_point is None:
             self.stage_point = config.stage_point
-        else: 
+        else:
             self.stage_point = stage_point
 
     def load(self, path):
         return FileHandle(path, self.stage_point)
 
-class FileHandle(object):
 
-    '''
+class FileHandle(object):
+    """
     A portable container for a file.
-    '''
+    """
+
     def __init__(self, path, stage_point):
         source = fsspec.open(path)
         ext = os.path.splitext(path)[1]
@@ -70,7 +72,7 @@ class FileHandle(object):
             source.close()
             self.store.close()
             self.store.mode = 'rb'
-   
+
     def __str__(self):
         return self.__fspath__()
 
@@ -95,7 +97,7 @@ class FileHandle(object):
                     d.write(s.read())
         dest.close()
         return path
-            
+
     def __fspath__(self):
         """
         Returns a path on the current local file system which points at the file
@@ -111,7 +113,7 @@ class FileHandle(object):
         if self.local_path is not None:
             try:
                 os.remove(self.local_path)
-            except:
+            except FileNotFoundError:
                 pass
 
     def read_binary(self):
