@@ -95,17 +95,17 @@ def test_subprocess_kernel_s3(myclient, tmpdir):
     except AssertionError:
         print('Error: result.result() = {}'.format(result.result()))
 
-
 if __name__ == '__main__':
-    dask_client = DaskClient()
-    myclient = clients.Client(dask_client)
+    #dask_client = DaskClient()
+    #myclient = clients.Client(dask_client)
+    myclient = clients.Client()
     tmpdir = Path(tempfile.mkdtemp())
     test_function_kernel(myclient, tmpdir)
     test_function_kernel_no_filehandler(myclient, tmpdir)
     test_subprocess_kernel_data(myclient, tmpdir)
     test_subprocess_kernel_no_filehandler(myclient, tmpdir)
     test_subprocess_kernel_file(myclient, tmpdir)
-    test_subprocess_kernel_s3(myclient, tmpdir)
+    #test_subprocess_kernel_s3(myclient, tmpdir)
     myclient.close()
 
 

@@ -3,7 +3,7 @@
 # Basic example of how to create kernels, load input data, and
 # run locally (without using a client)
 #
-from crossflow import clients, kernels
+from crossflow import kernels
 from pathlib import Path
 # Create two short text files:
 here = Path('.')

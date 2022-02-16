@@ -1,5 +1,6 @@
 """
-Xflowlib: the Xflow library to build workflows on an Xbow cluster
+Crossflow kernels: wrappers round subprocess calls and python functions for
+execution on a crossflow cluster
 """
 import re
 import subprocess

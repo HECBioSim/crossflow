@@ -54,6 +54,10 @@ class FileHandle(object):
     """
 
     def __init__(self, path, stage_point):
+        if not isinstance(path, (os.PathLike, str, bytes)):
+            raise IOError('Error - illegal argument type {} for {}'.format(type(path), path))
+        if not os.path.exists(path):
+            raise IOError('Error - no such file')
         source = fsspec.open(path)
         ext = os.path.splitext(path)[1]
         self.path = path
@@ -110,6 +114,8 @@ class FileHandle(object):
             return self.local_path
 
     def __del__(self):
+        if not hasattr(self, 'local_path'): # fix for odd bug...
+            return
         if self.local_path is not None:
             try:
                 os.remove(self.local_path)

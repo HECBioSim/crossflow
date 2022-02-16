@@ -2,6 +2,7 @@
 Clients.py: thin wrapper over dask client
 """
 import glob
+from dask.distributed import Client as DaskClient
 from collections import Iterable
 from .kernels import FunctionKernel, SubprocessKernel
 from .filehandling import FileHandler
@@ -12,8 +13,8 @@ class Client(object):
     """Thin wrapper around Dask client so functions that return multiple
        values (tuples) generate tuples of futures rather than single futures.
     """
-    def __init__(self, dask_client):
-        self.client = dask_client
+    def __init__(self, *args, **kwargs):
+        self.client = DaskClient(*args, **kwargs)
         self.filehandler = FileHandler(config.stage_point)
 
     def close(self):

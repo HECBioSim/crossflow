@@ -46,7 +46,7 @@ def run(client):
 
 if __name__ == '__main__':
     # Create a local compute cluster and the client to serve it:
-    client = clients.Client(local=True)
+    client = clients.Client()
     output_file = run(client)
     print(output_file.read_text())
     # Close the client and compute cluster:
