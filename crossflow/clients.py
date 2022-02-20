@@ -5,6 +5,7 @@ import glob
 from dask.distributed import Client as DaskClient
 from collections import Iterable
 from .kernels import FunctionKernel, SubprocessKernel
+from .tasks import FunctionTask, SubprocessTask
 from .filehandling import FileHandler
 from . import config
 
@@ -39,25 +40,25 @@ class Client(object):
             pass
         return self.client.scatter(some_object, broadcast=True)
 
-    def unpack(self, kernel, future):
+    def unpack(self, task, future):
         """
-        Unpacks the single future returned by kernel when run through
+        Unpacks the single future returned by task when run through
         a dask submit() or map() method, returning a tuple of futures.
 
-        The outputs attribute of kernel lists how many values kernel
+        The outputs attribute of task lists how many values task
         should properly return.
 
         args:
-            kernel (Kernel): the kernel that generated the future
+            task (Task or Kernel): the task/kernel that generated the future
             future (Future): the future returned by kernel
 
         returns:
             future or tuple of futures.
         """
-        if len(kernel.outputs) == 1:
+        if len(task.outputs) == 1:
             return future
         outputs = []
-        for i in range(len(kernel.outputs)):
+        for i in range(len(task.outputs)):
             outputs.append(self.client.submit(lambda tup, j: tup[j], future, i))
         return tuple(outputs)
 
@@ -150,10 +151,8 @@ class Client(object):
             future or tuple of futures
         """
         newargs = self._filehandlify(args)
-        if isinstance(func, SubprocessKernel):
-            future = self.client.submit(func.run, *newargs, pure=False)
-            return self.unpack(func, future)
-        if isinstance(func, FunctionKernel):
+        if isinstance(func, (SubprocessKernel, FunctionKernel, 
+                             SubprocessTask, FunctionTask)):
             future = self.client.submit(func.run, *newargs, pure=False)
             return self.unpack(func, future)
         else:
@@ -194,10 +193,8 @@ class Client(object):
             else:
                 its.append([iterable] * maxlen)
         newits = self._filehandlify(its)
-        if isinstance(func, SubprocessKernel):
-            futures = self.client.map(func.run, *newits, pure=False)
-            result = [self.unpack(func, future) for future in futures]
-        elif isinstance(func, FunctionKernel):
+        if isinstance(func, (SubprocessKerneli, FunctionKernel,
+                             SubprocessTask, FunctionTask)):
             futures = self.client.map(func.run, *newits, pure=False)
             result = [self.unpack(func, future) for future in futures]
         else:

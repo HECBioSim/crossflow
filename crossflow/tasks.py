@@ -1,5 +1,5 @@
 """
-Crossflow kernels: wrappers round subprocess calls and python functions for
+Crossflow tasks: wrappers round subprocess calls and python functions for
 execution on a crossflow cluster
 """
 import re
@@ -37,9 +37,9 @@ def _gen_filenames(pattern, n_files):
     return filenames
 
 
-class SubprocessKernel(object):
+class SubprocessTask(object):
     """
-    A kernel that runs a command-line executable
+    A task that runs a command-line executable
     """
 
     def __init__(self, template):
@@ -60,7 +60,7 @@ class SubprocessKernel(object):
 
     def set_inputs(self, inputs):
         """
-        Set the inputs the kernel requires
+        Set the inputs the task requires
         """
         if not isinstance(inputs, list):
             raise TypeError('Error - inputs must be of type list,'
@@ -69,7 +69,7 @@ class SubprocessKernel(object):
 
     def set_outputs(self, outputs):
         """
-        Set the outputs the kernel produces
+        Set the outputs the task produces
         """
         if not isinstance(outputs, list):
             raise TypeError('Error - outputs must be of type list,'
@@ -78,7 +78,7 @@ class SubprocessKernel(object):
 
     def set_constant(self, key, value):
         """
-        Set a constant for the kernel
+        Set a constant for the task
         If it was previously defined as an input variable, remove it from
         that list.
         """
@@ -94,13 +94,13 @@ class SubprocessKernel(object):
 
     def copy(self):
         """
-        Return a copy of the kernel
+        Return a copy of the task
         """
         return copy.deepcopy(self)
 
     def run(self, *args):
         """
-        Run the kernel with the given inputs.
+        Run the task with the given inputs.
         Args:
             args: positional arguments whose order should match self.inputs
 
@@ -176,7 +176,7 @@ class SubprocessKernel(object):
         return outputs
 
 
-class FunctionKernel(object):
+class FunctionTask(object):
     def __init__(self, func):
         """
         Arguments:
@@ -191,19 +191,19 @@ class FunctionKernel(object):
 
     def set_inputs(self, inputs):
         """
-        Set the inputs the kernel requires
+        Set the inputs the task requires
         """
         self.inputs = inputs
 
     def set_outputs(self, outputs):
         """
-        Set the outputs the kernel produces
+        Set the outputs the task produces
         """
         self.outputs = outputs
 
     def set_constant(self, key, value):
         """
-        Set a parameters for the kernel
+        Set a parameters for the task
         """
         try:
             self.constants[key] = self.filehandler.load(value)
@@ -212,13 +212,13 @@ class FunctionKernel(object):
 
     def copy(self):
         """
-        Return a copy of the kernel
+        Return a copy of the task
         """
         return copy.copy(self)
 
     def run(self, *args):
         """
-        Run the kernel/function with the given arguments.
+        Run the task/function with the given arguments.
 
         Returns:
             Whatever the function returns, with output files converted
@@ -284,7 +284,7 @@ class XflowError(Exception):
 
 class CalledProcessError(XflowError):
     """
-    Exception raised if a kernel fails with an error.
+    Exception raised if a task fails with an error.
 
     A cosmetic wrapper round subprocess.CalledProcessError
     """
