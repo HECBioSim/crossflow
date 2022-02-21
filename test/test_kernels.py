@@ -1,4 +1,5 @@
 from crossflow import filehandling, kernels
+import pytest
 
 
 def test_subprocess_kernel_no_filehandles(tmpdir):

@@ -9,10 +9,11 @@
 from crossflow import clients, tasks
 from pathlib import Path
 
+
 def run(client):
     # Create two short text files:
     here = Path('.')
-    input_file1 = here /'file1.txt'
+    input_file1 = here / 'file1.txt'
     input_file1.write_text('content\n')
     input_file2 = here / 'file2.txt'
     input_file2.write_text('more content\n')
@@ -24,7 +25,7 @@ def run(client):
     # into a list:
     inputs = [input_file1, input_file2]
     # Send the job to the client via the submit() method:
-    output = client.submit(joiner, inputs) 
+    output = client.submit(joiner, inputs)
     # The client returns outputs as Futures, so call their result() method
     # to get the actual data:
     output_filehandle = output.result()
@@ -32,6 +33,7 @@ def run(client):
     output_file = here / 'joined.txt'
     output_filehandle.save(output_file)
     return output_file
+
 
 if __name__ == '__main__':
     # Create a local compute cluster and the client to serve it:

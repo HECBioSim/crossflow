@@ -9,10 +9,11 @@
 from crossflow import clients, tasks
 from pathlib import Path
 
+
 def run(client):
     # Create the initial text file:
     here = Path('.')
-    input_file = here /'input.txt'
+    input_file = here / 'input.txt'
     with input_file.open('w') as f:
         for i in range(50):
             f.write('line {}\n'.format(i))
@@ -43,6 +44,7 @@ def run(client):
     output_file = here / 'processed.txt'
     output_filehandle.save(output_file)
     return output_file
+
 
 if __name__ == '__main__':
     # Create a local compute cluster and the client to serve it:
