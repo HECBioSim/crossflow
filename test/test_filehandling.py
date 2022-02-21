@@ -1,4 +1,3 @@
-import crossflow
 from crossflow import filehandling
 import os.path as op
 
