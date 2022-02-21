@@ -55,7 +55,9 @@ class FileHandle(object):
 
     def __init__(self, path, stage_point):
         if not isinstance(path, (os.PathLike, str, bytes)):
-            raise IOError('Error - illegal argument type {} for {}'.format(type(path), path))
+            raise IOError(
+                f'Error - illegal argument type {type(path)} for {path}'
+                )
         if not os.path.exists(path):
             raise IOError('Error - no such file')
         source = fsspec.open(path)
@@ -69,7 +71,9 @@ class FileHandle(object):
                 self.store = zlib.compress(s.read())
         else:
             self.staging_path = op.join(stage_point, self.uid)
-            self.store = fsspec.open(self.staging_path, 'wb', compression='bz2')
+            self.store = fsspec.open(
+                self.staging_path, 'wb', compression='bz2'
+                )
             with source as s:
                 with self.store as d:
                     d.write(s.read())
@@ -104,7 +108,8 @@ class FileHandle(object):
 
     def __fspath__(self):
         """
-        Returns a path on the current local file system which points at the file
+        Returns a path on the current local file system which
+        points at the file
         """
         if self.local_path is None:
             self.local_path = os.path.join(tempfile.gettempdir(), self.uid)
@@ -114,7 +119,7 @@ class FileHandle(object):
             return self.local_path
 
     def __del__(self):
-        if not hasattr(self, 'local_path'): # fix for odd bug...
+        if not hasattr(self, 'local_path'):  # fix for odd bug...
             return
         if self.local_path is not None:
             try:

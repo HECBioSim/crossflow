@@ -133,7 +133,7 @@ class SubprocessTask(object):
                     dtmp.save(op.join(td, d['name']))
                 else:
                     var_dict[d['name']] = dtmp
-            else: 
+            else:
                 try:
                     d['value'].save(op.join(td, d['name']))
                 except AttributeError:
@@ -251,7 +251,9 @@ class FunctionTask(object):
                     indict[self.inputs[i]] = v
         for k in self.constants:
             try:
-                indict[k] = self.constants[k].save(os.path.basename(self.constants[k].path))
+                indict[k] = self.constants[k].save(
+                    os.path.basename(self.constants[k].path)
+                    )
             except AttributeError:
                 indict[k] = self.constants[k]
         result = self.func(**indict)
@@ -297,7 +299,7 @@ class CalledProcessError(XflowError):
         self.output = self.stdout
 
     def __str__(self):
-        return 'Error: command "{}" failed with return code {}; STDOUT="{}"; STDERR="{}"'.format(self.cmd,
-                                                                                                 self.returncode,
-                                                                                                 self.stdout,
-                                                                                                 self.stderr)
+        message = f'Error: command "{self.cmd}"'
+        message += f' failed with return code {self.returncode};'
+        message += f' STDOUT="{self.stdout}"; STDERR="{self.stderr}"'
+        return message

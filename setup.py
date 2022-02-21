@@ -6,8 +6,13 @@ import sys
 import re
 import textwrap
 
+from setuptools import setup, find_packages
+from setuptools import Extension as Ext
+
 
 """Some functions for checking and showing errors and warnings."""
+
+
 def _print_admonition(kind, head, body):
     tw = textwrap.TextWrapper(initial_indent='   ', subsequent_indent='   ')
 
@@ -32,11 +37,13 @@ def check_import(pkgname, pkgver):
         if mod.__version__ < pkgver:
             raise ImportError
     except ImportError:
-        exit_with_error("Can't find a local {0} installation with version >= {1}. "
-                        "Crossflow needs {0} {1} or greater to compile and run! "
-                        "Please see the ``README`` file.".format(pkgname, pkgver))
+        exit_with_error(f"Can't find a local {pkgname} installation"
+                        f" with version >= {pkgver}. "
+                        f"Crossflow needs {pkgname} {pkgname} or greater"
+                        " to compile and run! "
+                        "Please see the ``README`` file.")
 
-    print("* Found {0} {1} package installed.".format(pkgname, mod.__version__))
+    print(f"* Found {pkgname} {mod.__version__} package installed.")
     globals()[pkgname] = mod
 
 
@@ -52,7 +59,7 @@ mo = re.search(VSRE, verstrline, re.M)
 if mo:
     verstr = mo.group(1)
 else:
-    raise RunTimeError("Unable to find version string in {}.".format(VERSIONFILE))
+    raise RuntimeError(f"Cannot find version string in {VERSIONFILE}.")
 
 
 """Check Python version"""
@@ -63,10 +70,11 @@ print("* Python version OK!")
 
 
 """Set up crossflow."""
-from setuptools import setup, find_packages
-from setuptools import Extension as Ext
+
+
 class Extension(Ext, object):
     pass
+
 
 setup_args = {
     'name':             "crossflow",

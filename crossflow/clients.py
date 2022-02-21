@@ -59,7 +59,9 @@ class Client(object):
             return future
         outputs = []
         for i in range(len(task.outputs)):
-            outputs.append(self.client.submit(lambda tup, j: tup[j], future, i))
+            outputs.append(
+                self.client.submit(lambda tup, j: tup[j], future, i)
+                )
         return tuple(outputs)
 
     def _filehandlify(self, args):
@@ -151,7 +153,7 @@ class Client(object):
             future or tuple of futures
         """
         newargs = self._filehandlify(args)
-        if isinstance(func, (SubprocessKernel, FunctionKernel, 
+        if isinstance(func, (SubprocessKernel, FunctionKernel,
                              SubprocessTask, FunctionTask)):
             future = self.client.submit(func.run, *newargs, pure=False)
             return self.unpack(func, future)
@@ -188,12 +190,14 @@ class Client(object):
             if isinstance(iterable, list):
                 n_items = len(iterable)
                 if n_items != maxlen:
-                    raise ValueError('Error: not all iterables are same length')
+                    raise ValueError(
+                        'Error: not all iterables are same length'
+                        )
                 its.append(iterable)
             else:
                 its.append([iterable] * maxlen)
         newits = self._filehandlify(its)
-        if isinstance(func, (SubprocessKerneli, FunctionKernel,
+        if isinstance(func, (SubprocessKernel, FunctionKernel,
                              SubprocessTask, FunctionTask)):
             futures = self.client.map(func.run, *newits, pure=False)
             result = [self.unpack(func, future) for future in futures]
