@@ -1,8 +1,6 @@
 from crossflow import filehandling, tasks
-import tempfile
-import os.path as op
-import os
 import pytest
+
 
 def test_subprocess_task_no_filehandles(tmpdir):
     sk = tasks.SubprocessTask('cat file.txt')
@@ -13,6 +11,7 @@ def test_subprocess_task_no_filehandles(tmpdir):
     result = sk.run(p)
     assert result == 'content'
 
+
 def test_subprocess_task_stdout(tmpdir):
     sk = tasks.SubprocessTask('cat file.txt')
     sk.set_inputs(['file.txt'])
@@ -20,9 +19,10 @@ def test_subprocess_task_stdout(tmpdir):
     p = tmpdir.mkdir('sub').join("hello.txt")
     p.write("content")
     fh = filehandling.FileHandler()
-    l = fh.load(p)
-    result = sk.run(l)
+    pf = fh.load(p)
+    result = sk.run(pf)
     assert result == 'content'
+
 
 def test_subprocess_task_fileout(tmpdir):
     sk = tasks.SubprocessTask('cat file.txt > out.dat')
@@ -31,9 +31,10 @@ def test_subprocess_task_fileout(tmpdir):
     p = tmpdir.mkdir('sub').join("hello.txt")
     p.write("content")
     fh = filehandling.FileHandler()
-    l = fh.load(p)
-    result = sk.run(l)
+    pf = fh.load(p)
+    result = sk.run(pf)
     assert isinstance(result, filehandling.FileHandle)
+
 
 def test_subprocess_task_globinputs(tmpdir):
     sk = tasks.SubprocessTask('cat *.txt > out.dat')
@@ -45,11 +46,12 @@ def test_subprocess_task_globinputs(tmpdir):
     p.write("content\n")
     q.write("more content\n")
     fh = filehandling.FileHandler()
-    l = [fh.load(x) for x in [p, q]]
-    result = sk.run(l)
+    pf = [fh.load(x) for x in [p, q]]
+    result = sk.run(pf)
     r = d.join("output.dat")
     result.save(r)
     assert r.read() == 'content\nmore content\n'
+
 
 def test_subprocess_task_globoutputs(tmpdir):
     sk = tasks.SubprocessTask('split -l 1 input.txt')
@@ -59,21 +61,24 @@ def test_subprocess_task_globoutputs(tmpdir):
     p = d.join("lines.txt")
     p.write("line 1\nline 2\nline 3\n")
     fh = filehandling.FileHandler()
-    l = fh.load(p)
-    result = sk.run(l)
+    pf = fh.load(p)
+    result = sk.run(pf)
     assert len(result) == 3
+
 
 def test_subprocess_task_fails():
     with pytest.raises(tasks.XflowError):
         sk = tasks.SubprocessTask('foo -bar')
         sk.set_outputs([tasks.STDOUT])
-        result = sk.run()
+        sk.run()
+
 
 def test_subprocess_task_catch_fail():
     sk = tasks.SubprocessTask('foo -bar')
     sk.set_outputs([tasks.DEBUGINFO])
     result = sk.run()
     assert isinstance(result, tasks.XflowError)
+
 
 def test_function_task_basic():
     def mult(a, b):
@@ -85,12 +90,13 @@ def test_function_task_basic():
     result = fk.run(3, 4)
     assert result == 12
 
+
 def test_function_task_with_filehandles(tmpdir):
     d = tmpdir.mkdir('sub')
     p = d.join("lines.txt")
     p.write("line 1\nline 2\nline 3\n")
     fh = filehandling.FileHandler()
-    l = fh.load(p)
+    pf = fh.load(p)
 
     def linecount(a):
         with open(a) as f:
@@ -100,13 +106,15 @@ def test_function_task_with_filehandles(tmpdir):
     fk = tasks.FunctionTask(linecount)
     fk.set_inputs(['a'])
     fk.set_outputs(['nlines'])
-    result = fk.run(l)
+    result = fk.run(pf)
     assert result == 3
+
 
 def test_function_task_no_filehandles(tmpdir):
     d = tmpdir.mkdir('sub')
     p = d.join("lines.txt")
     p.write("line 1\nline 2\nline 3\n")
+
     def linecount(a):
         with open(a) as f:
             lines = f.readlines()

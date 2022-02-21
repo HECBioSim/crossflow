@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 from crossflow import filehandling, kernels, clients
-from distributed import Client as DaskClient
 import tempfile
 from pathlib import Path
-import os.path as op
-import os
+
 
 def test_function_kernel(myclient, tmpdir):
     def testit(f):
@@ -15,13 +13,14 @@ def test_function_kernel(myclient, tmpdir):
     p = tmpdir / "hello.txt"
     p.write_text("content")
     fh = filehandling.FileHandler()
-    l = fh.load(p)
-    result = myclient.submit(fk, l)
+    pf = fh.load(p)
+    result = myclient.submit(fk, pf)
     try:
         assert isinstance(result.result(), filehandling.FileHandle)
     except AssertionError:
         print('Error: result.result() = {}'.format(result.result()))
         raise
+
 
 def test_function_kernel_no_filehandler(myclient, tmpdir):
     def testit(f):
@@ -38,6 +37,7 @@ def test_function_kernel_no_filehandler(myclient, tmpdir):
         print('Error: result.result() = {}'.format(result.result()))
         raise
 
+
 def test_subprocess_kernel_data(myclient, tmpdir):
     sk = kernels.SubprocessKernel('cat file.txt')
     sk.set_inputs(['file.txt'])
@@ -45,13 +45,14 @@ def test_subprocess_kernel_data(myclient, tmpdir):
     p = tmpdir / "hello.txt"
     p.write_text("content")
     fh = filehandling.FileHandler()
-    l = fh.load(p)
-    ll = myclient.upload(l)
+    pf = fh.load(p)
+    ll = myclient.upload(pf)
     result = myclient.submit(sk, ll)
     try:
         assert result.result() == 'content'
     except AssertionError:
         print('Error: result.result() = {}'.format(result.result()))
+
 
 def test_subprocess_kernel_no_filehandler(myclient, tmpdir):
     sk = kernels.SubprocessKernel('cat file.txt')
@@ -65,6 +66,7 @@ def test_subprocess_kernel_no_filehandler(myclient, tmpdir):
     except AssertionError:
         print('Error: result.result() = {}'.format(result.result()))
 
+
 def test_subprocess_kernel_file(myclient, tmpdir):
     sk = kernels.SubprocessKernel('cat file.txt')
     sk.set_inputs(['file.txt'])
@@ -72,13 +74,14 @@ def test_subprocess_kernel_file(myclient, tmpdir):
     p = tmpdir / "hello.txt"
     p.write_text("content")
     fh = filehandling.FileHandler(tmpdir)
-    l = fh.load(p)
-    ll = myclient.upload(l)
+    pf = fh.load(p)
+    ll = myclient.upload(pf)
     result = myclient.submit(sk, ll)
     try:
         assert result.result() == 'content'
     except AssertionError:
         print('Error: result.result() = {}'.format(result.result()))
+
 
 def test_subprocess_kernel_s3(myclient, tmpdir):
     sk = kernels.SubprocessKernel('cat file.txt')
@@ -86,18 +89,17 @@ def test_subprocess_kernel_s3(myclient, tmpdir):
     sk.set_outputs([kernels.STDOUT])
     p = tmpdir / "hello.txt"
     p.write_text("content")
-    fh = filehandling.FileHandler('s3://laughtongroup.charlie.bucket0/crossflow')
-    l = fh.load(p)
-    ll = myclient.upload(l)
+    fh = filehandling.FileHandler('s3://bucket_name')
+    fp = fh.load(p)
+    ll = myclient.upload(fp)
     result = myclient.submit(sk, ll)
     try:
         assert result.result() == 'content'
     except AssertionError:
         print('Error: result.result() = {}'.format(result.result()))
 
+
 if __name__ == '__main__':
-    #dask_client = DaskClient()
-    #myclient = clients.Client(dask_client)
     myclient = clients.Client()
     tmpdir = Path(tempfile.mkdtemp())
     test_function_kernel(myclient, tmpdir)
@@ -105,7 +107,6 @@ if __name__ == '__main__':
     test_subprocess_kernel_data(myclient, tmpdir)
     test_subprocess_kernel_no_filehandler(myclient, tmpdir)
     test_subprocess_kernel_file(myclient, tmpdir)
-    #test_subprocess_kernel_s3(myclient, tmpdir)
     myclient.close()
 
 
