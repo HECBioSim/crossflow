@@ -16,7 +16,7 @@ def test_data_protocol(tmpdir):
 
 
 def test_config(tmpdir):
-    crossflow.set_stage_point(tmpdir)
+    filehandling.set_stage_point(tmpdir)
     fh = filehandling.FileHandler()
     assert fh.stage_point == tmpdir
 
