@@ -10,26 +10,21 @@ from .filehandling import FileHandler
 from . import config
 
 
-class Client(object):
+class Client(DaskClient):
     """Thin wrapper around Dask client so functions that return multiple
        values (tuples) generate tuples of futures rather than single futures.
     """
     def __init__(self, *args, **kwargs):
-        self.client = DaskClient(*args, **kwargs)
         self.filehandler = FileHandler(config.stage_point)
+        super().__init__(*args, **kwargs)
 
-    def close(self):
-        """
-        The close() method of the underlying dask client
-        """
-        return self.client.close()
 
     def upload(self, some_object):
         """
         Upload some data/object to the.workers
 
         args:
-            fsome_object (any type): what to upload
+            some_object (any type): what to upload
 
         returns:
             dask.Future
@@ -38,9 +33,9 @@ class Client(object):
             some_object = self.filehandler.load(some_object)
         except IOError:
             pass
-        return self.client.scatter(some_object, broadcast=True)
+        return self.scatter(some_object, broadcast=True)
 
-    def unpack(self, task, future):
+    def _unpack(self, task, future):
         """
         Unpacks the single future returned by task when run through
         a dask submit() or map() method, returning a tuple of futures.
@@ -60,7 +55,7 @@ class Client(object):
         outputs = []
         for i in range(len(task.outputs)):
             outputs.append(
-                self.client.submit(lambda tup, j: tup[j], future, i)
+                self.submit(lambda tup, j: tup[j], future, i)
                 )
         return tuple(outputs)
 
@@ -141,7 +136,7 @@ class Client(object):
                 pass
         return newargs
 
-    def submit(self, func, *args):
+    def submit(self, func, *args, **kwargs):
         """
         Wrapper round the dask submit() method, so that a tuple of
         futures, rather than just one future, is returned.
@@ -149,16 +144,18 @@ class Client(object):
         args:
             func (function/kernel): the function to be run
             args (list): the function arguments
+            kwargs (dict): keyword arguments to submit()
         returns:
             future or tuple of futures
         """
         newargs = self._filehandlify(args)
         if isinstance(func, (SubprocessKernel, FunctionKernel,
                              SubprocessTask, FunctionTask)):
-            future = self.client.submit(func.run, *newargs, pure=False)
-            return self.unpack(func, future)
+            kwargs['pure'] = False
+            future = super().submit(func.run, *newargs, **kwargs)
+            return self._unpack(func, future)
         else:
-            return self.client.submit(func, *args)
+            return super().submit(func, *args, **kwargs)
 
     def _lt2tl(self, tuplist):
         """converts a list of tuples to a tuple of lists"""
@@ -167,7 +164,7 @@ class Client(object):
             result.append([t[i] for t in tuplist])
         return tuple(result)
 
-    def map(self, func, *iterables):
+    def map(self, func, *iterables, **kwargs):
         """
         Wrapper arounf the dask map() method so it returns lists of
         tuples of futures, rather than lists of futures.
@@ -197,12 +194,13 @@ class Client(object):
             else:
                 its.append([iterable] * maxlen)
         newits = self._filehandlify(its)
+        kwargs['pure'] = False
         if isinstance(func, (SubprocessKernel, FunctionKernel,
                              SubprocessTask, FunctionTask)):
-            futures = self.client.map(func.run, *newits, pure=False)
-            result = [self.unpack(func, future) for future in futures]
+            futures = super().map(func.run, *newits, **kwargs)
+            result = [self._unpack(func, future) for future in futures]
         else:
-            result = self.client.map(func, *its, pure=False)
+            result = super().map(func, *its, **kwargs)
         if isinstance(result[0], tuple):
             result = self._lt2tl(result)
         return result
