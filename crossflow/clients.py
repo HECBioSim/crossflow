@@ -18,7 +18,6 @@ class Client(DaskClient):
         self.filehandler = FileHandler(config.stage_point)
         super().__init__(*args, **kwargs)
 
-
     def upload(self, some_object):
         """
         Upload some data/object to the.workers
