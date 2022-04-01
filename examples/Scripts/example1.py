@@ -18,7 +18,7 @@ joiner.set_outputs(['output'])
 # The task expects an arbitrary number of input files, so put the inputs
 # into a list, and then call the task's .run() method:
 inputs = [file1, file2]
-joined = joiner.run(inputs)
+joined, status = joiner.run(inputs)
 # Save the output FileHandle object as a file, and list its contents:
 output = here / 'joined.txt'
 joined.save(output)

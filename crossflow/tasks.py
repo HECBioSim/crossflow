@@ -106,7 +106,7 @@ class SubprocessTask(object):
 
         Returns:
             tuple : outputs in the order they appear in
-                self.outputs
+                self.outputs, plus the CompletedProcess
         """
         outputs = []
         td = tempfile.mkdtemp()
@@ -139,21 +139,12 @@ class SubprocessTask(object):
                 except AttributeError:
                     var_dict[d['name']] = d['value']
         cmd = self.template.format(**var_dict)
-        try:
-            result = subprocess.run(cmd, shell=True,
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE,
-                                    cwd=td,
-                                    check=True)
-        except subprocess.CalledProcessError as e:
-            result = CalledProcessError(e)
-            if DEBUGINFO not in self.outputs:
-                raise result
+        result = subprocess.run(cmd, shell=True,
+                                capture_output=True,
+                                cwd=td)
 
-        self.STDOUT = result.stdout.decode()
         for outfile in self.outputs:
-            if outfile not in [STDOUT, DEBUGINFO]:
-                outfile = op.join(td, outfile)
+            outfile = op.join(td, outfile)
             if '*' in outfile or '?' in outfile:
                 outf = glob.glob(outfile)
                 outf.sort()
@@ -161,13 +152,13 @@ class SubprocessTask(object):
             else:
                 if op.exists(outfile):
                     outputs.append(self.filehandler.load(outfile))
-                elif outfile == STDOUT:
-                    outputs.append(self.STDOUT)
-                elif outfile == DEBUGINFO:
-                    outputs.append(result)
                 else:
                     outputs.append(None)
         shutil.rmtree(td, ignore_errors=True)
+
+        if result.returncode != 0:
+            result = CalledProcessError(result)
+        outputs.append(result)
 
         if len(outputs) == 1:
             outputs = outputs[0]
@@ -222,7 +213,7 @@ class FunctionTask(object):
 
         Returns:
             Whatever the function returns, with output files converted
-                to FileHandle objects
+                to FileHandle objects, plus a status object
         """
         td = tempfile.mkdtemp()
         os.chdir(td)
@@ -256,8 +247,14 @@ class FunctionTask(object):
                     )
             except AttributeError:
                 indict[k] = self.constants[k]
-        result = self.func(**indict)
-        if not isinstance(result, list):
+        try:
+            result = self.func(**indict)
+            exception = CalledProcessResult()
+        except Exception as e:
+            result = None
+            exception = e
+
+        if not isinstance(result, tuple):
             result = [result]
         outputs = []
         for i, v in enumerate(result):
@@ -270,11 +267,21 @@ class FunctionTask(object):
                 outputs.append(v)
             shutil.rmtree(td, ignore_errors=True)
 
+        outputs.append(exception)
+
         if len(outputs) == 1:
             outputs = outputs[0]
         else:
             outputs = tuple(outputs)
         return outputs
+
+
+class CalledProcessResult():
+    """
+    Class for succesful FunctionTask status data
+    """
+    def __init__(self):
+        self.returncode = 0
 
 
 class XflowError(Exception):
@@ -292,11 +299,10 @@ class CalledProcessError(XflowError):
     """
 
     def __init__(self, e):
-        self.cmd = e.cmd
+        self.cmd = ' '.join(e.args)
         self.returncode = e.returncode
         self.stdout = e.stdout
         self.stderr = e.stderr
-        self.output = self.stdout
 
     def __str__(self):
         message = f'Error: command "{self.cmd}"'

@@ -40,7 +40,8 @@ class Client(DaskClient):
         a dask submit() or map() method, returning a tuple of futures.
 
         The outputs attribute of task lists how many values task
-        should properly return.
+        should properly return - one more than the length of this,
+        to account for the status object.
 
         args:
             task (Task or Kernel): the task/kernel that generated the future
@@ -49,10 +50,10 @@ class Client(DaskClient):
         returns:
             future or tuple of futures.
         """
-        if len(task.outputs) == 1:
+        if len(task.outputs) == 0:
             return future
         outputs = []
-        for i in range(len(task.outputs)):
+        for i in range(len(task.outputs) + 1):
             outputs.append(
                 self.submit(lambda tup, j: tup[j], future, i)
                 )
