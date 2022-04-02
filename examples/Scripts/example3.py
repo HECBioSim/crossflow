@@ -31,14 +31,12 @@ def run(client):
     joiner.set_outputs(['output'])
     # Here is the workflow, using .submit() and .map() methods.
     # First split the file into pieces:
-    pieces_and_status = client.submit(splitter, input_file)
-    # 'pieces_and_status' is a tuple, the last element is the status
-    # object all Crossflow Tasks return, so convert the rest to a list 
-    # and process each piece in parallel:
-    pieces = pieces_and_status[:-1]
-    reversed_pieces, status = client.map(reverser, list(pieces))
+    pieces = client.submit(splitter, input_file)
+    # 'pieces' is a tuple, convert to a list and process each
+    # piece in parallel:
+    reversed_pieces = client.map(reverser, list(pieces))
     # Stitch the reversed pieces back together again:
-    output, status = client.submit(joiner, reversed_pieces)
+    output = client.submit(joiner, reversed_pieces)
     # The client returns outputs as Futures, so call their result()
     # method to get the actual data:
     output_filehandle = output.result()

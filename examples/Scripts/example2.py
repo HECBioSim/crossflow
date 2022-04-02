@@ -25,7 +25,7 @@ def run(client):
     # into a list:
     inputs = [input_file1, input_file2]
     # Send the job to the client via the submit() method:
-    output, status = client.submit(joiner, inputs)
+    output = client.submit(joiner, inputs)
     # The client returns outputs as Futures, so call their result() method
     # to get the actual data:
     output_filehandle = output.result()
