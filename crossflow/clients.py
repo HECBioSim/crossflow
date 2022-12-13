@@ -3,7 +3,10 @@ Clients.py: thin wrapper over dask client
 """
 import glob
 from dask.distributed import Client as DaskClient
-from collections import Iterable
+try:
+    from collections import Iterable
+except ImportError:
+    from collections.abc import Iterable
 from .kernels import FunctionKernel, SubprocessKernel
 from .tasks import FunctionTask, SubprocessTask
 from .filehandling import FileHandler
