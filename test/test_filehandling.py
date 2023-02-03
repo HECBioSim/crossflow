@@ -12,6 +12,11 @@ def test_data_protocol(tmpdir):
     pf.save(q)
     assert q.read() == p.read()
     assert pf.read_text() == 'content'
+    r = d.join('hello3.txt')
+    rf = fh.create(r)
+    assert not op.exists(r)
+    rf.write_text('content')
+    assert rf.read_text() == 'content'
 
 
 def test_config(tmpdir):
@@ -42,7 +47,6 @@ def test_file_protocol(tmpdir):
     pf.save(q)
     assert q.read() == p.read()
     assert pf.read_text() == 'content'
-
 
 '''
 def test_s3_protocol(tmpdir):
