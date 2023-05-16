@@ -3,7 +3,7 @@ import os.path as op
 
 
 def test_data_protocol(tmpdir):
-    d = tmpdir.mkdir('sub')
+    d = tmpdir.mkdir("sub")
     p = d.join("hello.txt")
     p.write("content")
     fh = filehandling.FileHandler()
@@ -11,7 +11,7 @@ def test_data_protocol(tmpdir):
     q = d.join("hello2.txt")
     pf.save(q)
     assert q.read() == p.read()
-    assert pf.read_text() == 'content'
+    assert pf.read_text() == "content"
 
 
 def test_config(tmpdir):
@@ -21,19 +21,19 @@ def test_config(tmpdir):
 
 
 def test_cleanup(tmpdir):
-    d = tmpdir.mkdir('sub')
+    d = tmpdir.mkdir("sub")
     p = d.join("hello.txt")
     p.write("content")
     fh = filehandling.FileHandler()
     pf = fh.load(p)
     tmppath = str(pf)
     assert op.exists(tmppath)
-    del(pf)
+    del pf
     assert not op.exists(tmppath)
 
 
 def test_file_protocol(tmpdir):
-    d = tmpdir.mkdir('sub')
+    d = tmpdir.mkdir("sub")
     p = d.join("hello.txt")
     p.write("content")
     fh = filehandling.FileHandler(tmpdir)
@@ -41,10 +41,10 @@ def test_file_protocol(tmpdir):
     q = d.join("hello2.txt")
     pf.save(q)
     assert q.read() == p.read()
-    assert pf.read_text() == 'content'
+    assert pf.read_text() == "content"
 
 
-'''
+"""
 def test_s3_protocol(tmpdir):
     d = tmpdir.mkdir('sub')
     p = d.join("hello.txt")
@@ -55,4 +55,4 @@ def test_s3_protocol(tmpdir):
     ql = l.save(q)
     assert q.read() == p.read()
     assert l.read_text() == 'content'
-'''
+"""
