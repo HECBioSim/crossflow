@@ -1,5 +1,8 @@
 __pycache__/
+.vscode
+.idea
 *.egg_info/
 build/
 dist/
+dask-worker-space
 .ipynb_checkpoints/
