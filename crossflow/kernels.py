@@ -22,17 +22,17 @@ def _gen_filenames(pattern, n_files):
     """
     Generate a list of filenames consistent with a pattern.
     """
-    if '?' not in pattern and '*' not in pattern:
-        raise ValueError('Error - the pattern must contain * or ?')
+    if "?" not in pattern and "*" not in pattern:
+        raise ValueError("Error - the pattern must contain * or ?")
     fieldwidth = int(log10(n_files)) + 1
-    if '*' in pattern:
-        w = pattern.split('*')
-        template = '{}{{:0{}d}}{}'.format(w[0], fieldwidth, w[1])
+    if "*" in pattern:
+        w = pattern.split("*")
+        template = "{}{{:0{}d}}{}".format(w[0], fieldwidth, w[1])
     else:
-        w = pattern.split('?')
-        if pattern.count('?') < fieldwidth:
-            raise ValueError('Error - too many files for this pattern')
-        template = '{}{{:0{}d}}{}'.format(w[0], pattern.count('?'), w[-1])
+        w = pattern.split("?")
+        if pattern.count("?") < fieldwidth:
+            raise ValueError("Error - too many files for this pattern")
+        template = "{}{{:0{}d}}{}".format(w[0], pattern.count("?"), w[-1])
     filenames = [template.format(i) for i in range(n_files)]
     return filenames
 
@@ -55,7 +55,7 @@ class SubprocessKernel(object):
         self.filehandler = FileHandler(config.stage_point)
 
         self.variables = []
-        for key in re.findall(r'{.*?}', self.template):
+        for key in re.findall(r"{.*?}", self.template):
             self.variables.append(key[1:-1])
 
     def set_inputs(self, inputs):
@@ -63,8 +63,10 @@ class SubprocessKernel(object):
         Set the inputs the kernel requires
         """
         if not isinstance(inputs, list):
-            raise TypeError('Error - inputs must be of type list,'
-                            ' not of type {}'.format(type(inputs)))
+            raise TypeError(
+                "Error - inputs must be of type list,"
+                " not of type {}".format(type(inputs))
+            )
         self.inputs = inputs
 
     def set_outputs(self, outputs):
@@ -72,8 +74,10 @@ class SubprocessKernel(object):
         Set the outputs the kernel produces
         """
         if not isinstance(outputs, list):
-            raise TypeError('Error - outputs must be of type list,'
-                            ' not of type {}'.format(type(outputs)))
+            raise TypeError(
+                "Error - outputs must be of type list,"
+                " not of type {}".format(type(outputs))
+            )
         self.outputs = outputs
 
     def set_constant(self, key, value):
@@ -82,11 +86,11 @@ class SubprocessKernel(object):
         If it was previously defined as an input variable, remove it from
         that list.
         """
-        d = {'name': key}
+        d = {"name": key}
         try:
-            d['value'] = self.filehandler.load(value)
+            d["value"] = self.filehandler.load(value)
         except IOError:
-            d['value'] = value
+            d["value"] = value
         self.constants.append(d)
 
         if key in self.inputs:
@@ -118,33 +122,36 @@ class SubprocessKernel(object):
                 if isinstance(args[i], list):
                     fnames = _gen_filenames(self.inputs[i], len(args[i]))
                     for j, f in enumerate(args[i]):
-                        if not hasattr(f, 'save'):
+                        if not hasattr(f, "save"):
                             f = self.filehandler.load(f)
                         f.save(op.join(td, fnames[j]))
                 else:
                     f = args[i]
-                    if not hasattr(f, 'save'):
+                    if not hasattr(f, "save"):
                         f = self.filehandler.load(f)
                     f.save(op.join(td, self.inputs[i]))
         for d in self.constants:
-            if hasattr(d['value'], 'result'):
-                dtmp = d['value'].result()
-                if hasattr(dtmp, 'save'):
-                    dtmp.save(op.join(td, d['name']))
+            if hasattr(d["value"], "result"):
+                dtmp = d["value"].result()
+                if hasattr(dtmp, "save"):
+                    dtmp.save(op.join(td, d["name"]))
                 else:
-                    var_dict[d['name']] = dtmp
+                    var_dict[d["name"]] = dtmp
             else:
                 try:
-                    d['value'].save(op.join(td, d['name']))
+                    d["value"].save(op.join(td, d["name"]))
                 except AttributeError:
-                    var_dict[d['name']] = d['value']
+                    var_dict[d["name"]] = d["value"]
         cmd = self.template.format(**var_dict)
         try:
-            result = subprocess.run(cmd, shell=True,
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE,
-                                    cwd=td,
-                                    check=True)
+            result = subprocess.run(
+                cmd,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                cwd=td,
+                check=True,
+            )
         except subprocess.CalledProcessError as e:
             result = CalledProcessError(e)
             if DEBUGINFO not in self.outputs:
@@ -154,7 +161,7 @@ class SubprocessKernel(object):
         for outfile in self.outputs:
             if outfile not in [STDOUT, DEBUGINFO]:
                 outfile = op.join(td, outfile)
-            if '*' in outfile or '?' in outfile:
+            if "*" in outfile or "?" in outfile:
                 outf = glob.glob(outfile)
                 outf.sort()
                 outputs.append([self.filehandler.load(f) for f in outf])
@@ -253,7 +260,7 @@ class FunctionKernel(object):
             try:
                 indict[k] = self.constants[k].save(
                     os.path.basename(self.constants[k].path)
-                    )
+                )
             except AttributeError:
                 indict[k] = self.constants[k]
         result = self.func(**indict)
@@ -281,6 +288,7 @@ class XflowError(Exception):
     """
     Base class for Crossflow exceptions.
     """
+
     pass
 
 
@@ -300,6 +308,6 @@ class CalledProcessError(XflowError):
 
     def __str__(self):
         message = f'Error: command "{self.cmd}"'
-        message += f' failed with return code {self.returncode};'
+        message += f" failed with return code {self.returncode};"
         message += f' STDOUT="{self.stdout}"; STDERR="{self.stderr}"'
         return message

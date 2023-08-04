@@ -3,6 +3,7 @@ Clients.py: thin wrapper over dask client
 """
 import glob
 from dask.distributed import Client as DaskClient
+
 try:
     from collections import Iterable
 except ImportError:
@@ -15,8 +16,9 @@ from . import config
 
 class Client(DaskClient):
     """Thin wrapper around Dask client so functions that return multiple
-       values (tuples) generate tuples of futures rather than single futures.
+    values (tuples) generate tuples of futures rather than single futures.
     """
+
     def __init__(self, *args, **kwargs):
         self.filehandler = FileHandler(config.stage_point)
         super().__init__(*args, **kwargs)
@@ -56,9 +58,7 @@ class Client(DaskClient):
             return future
         outputs = []
         for i in range(len(task.outputs)):
-            outputs.append(
-                self.submit(lambda tup, j: tup[j], future, i)
-                )
+            outputs.append(self.submit(lambda tup, j: tup[j], future, i))
         return tuple(outputs)
 
     def _filehandlify(self, args):
@@ -73,7 +73,7 @@ class Client(DaskClient):
                     newa = []
                     for b in a:
                         if isinstance(b, Iterable):
-                            if '?' in b or '*' in b:
+                            if "?" in b or "*" in b:
                                 blist = glob.glob(b)
                                 blist.sort()
                                 if len(blist) > 0:
@@ -103,7 +103,7 @@ class Client(DaskClient):
                         newa.append(newb)
                 else:
                     if isinstance(a, Iterable):
-                        if '?' in a or '*' in a:
+                        if "?" in a or "*" in a:
                             alist = glob.glob(a)
                             alist.sort()
                             if len(alist) > 0:
@@ -151,9 +151,11 @@ class Client(DaskClient):
             future or tuple of futures
         """
         newargs = self._filehandlify(args)
-        if isinstance(func, (SubprocessKernel, FunctionKernel,
-                             SubprocessTask, FunctionTask)):
-            kwargs['pure'] = False
+        if isinstance(
+            func,
+            (SubprocessKernel, FunctionKernel, SubprocessTask, FunctionTask),
+        ):
+            kwargs["pure"] = False
             future = super().submit(func.run, *newargs, **kwargs)
             return self._unpack(func, future)
         else:
@@ -190,15 +192,17 @@ class Client(DaskClient):
                 n_items = len(iterable)
                 if n_items != maxlen:
                     raise ValueError(
-                        'Error: not all iterables are same length'
-                        )
+                        "Error: not all iterables are same length"
+                    )
                 its.append(iterable)
             else:
                 its.append([iterable] * maxlen)
         newits = self._filehandlify(its)
-        kwargs['pure'] = False
-        if isinstance(func, (SubprocessKernel, FunctionKernel,
-                             SubprocessTask, FunctionTask)):
+        kwargs["pure"] = False
+        if isinstance(
+            func,
+            (SubprocessKernel, FunctionKernel, SubprocessTask, FunctionTask),
+        ):
             futures = super().map(func.run, *newits, **kwargs)
             result = [self._unpack(func, future) for future in futures]
         else:

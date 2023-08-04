@@ -12,7 +12,7 @@ import fsspec
 import tempfile
 from . import config
 
-'''
+"""
 This module defines classes to handle files in distributed environments
 where filesyatems may not be shared.
 
@@ -30,7 +30,7 @@ be used:
 
     with open(fh) as f:
         ...
-'''
+"""
 
 
 def set_stage_point(stage_point):
@@ -59,11 +59,11 @@ class FileHandle(object):
     def __init__(self, path, stage_point, must_exist=True):
         if not isinstance(path, (os.PathLike, str, bytes)):
             raise IOError(
-                f'Error - illegal argument type {type(path)} for {path}'
-                )
+                f"Error - illegal argument type {type(path)} for {path}"
+            )
         if must_exist:
             if not os.path.exists(path):
-                raise IOError('Error - no such file')
+                raise IOError("Error - no such file")
             source = fsspec.open(path)
             ext = os.path.splitext(path)[1]
             self.path = path
@@ -76,17 +76,17 @@ class FileHandle(object):
             else:
                 self.staging_path = op.join(stage_point, self.uid)
                 self.store = fsspec.open(
-                    self.staging_path, 'wb', compression='bz2'
-                    )
+                    self.staging_path, "wb", compression="bz2"
+                )
                 with source as s:
                     with self.store as d:
                         d.write(s.read())
                 source.close()
                 self.store.close()
-                self.store.mode = 'rb'
+                self.store.mode = "rb"
         else:
             if os.path.exists(path):
-                    raise IOError('Error - file already exists')
+                raise IOError("Error - file already exists")
             ext = os.path.splitext(path)[1]
             self.uid = str(uuid.uuid4()) + ext
             self.local_path = None
@@ -110,7 +110,7 @@ class FileHandle(object):
             str: the path
         """
         source = self.store
-        dest = fsspec.open(path, 'wb')
+        dest = fsspec.open(path, "wb")
         if self.staging_path is None:
             with dest as d:
                 d.write(zlib.decompress(source))
@@ -134,7 +134,7 @@ class FileHandle(object):
             return self.local_path
 
     def __del__(self):
-        if not hasattr(self, 'local_path'):  # fix for odd bug...
+        if not hasattr(self, "local_path"):  # fix for odd bug...
             return
         if self.local_path is not None:
             try:
@@ -144,8 +144,8 @@ class FileHandle(object):
 
     def read_binary(self):
         source = self.store
-        if source == None:
-            return ''.encode('utf-8')
+        if source is None:
+            return "".encode("utf-8")
 
         if self.staging_path is None:
             data = zlib.decompress(source)
@@ -163,12 +163,11 @@ class FileHandle(object):
             self.store = compressed_data
         else:
             self.store = fsspec.open(
-                    self.staging_path, 'wb', compression='bz2'
-                    )
+                self.staging_path, "wb", compression="bz2"
+            )
             self.store.write(data)
             self.store.close()
-            self.store.mode = 'rb'
+            self.store.mode = "rb"
 
     def write_text(self, text):
-        self.write_binary(text.encode('utf-8'))
-
+        self.write_binary(text.encode("utf-8"))

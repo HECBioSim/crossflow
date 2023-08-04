@@ -1,0 +1,36 @@
+HEADER
+HEADER This is a pdb format file writen by the programm fpocket.                 
+HEADER It represents the atoms contacted by the voronoi vertices of the pocket.  
+HEADER                                                                           
+HEADER Information about the pocket     9:
+HEADER 0  - Pocket Score                      : -0.0252
+HEADER 1  - Drug Score                        : 0.0003
+HEADER 2  - Number of alpha spheres           :    16
+HEADER 3  - Mean alpha-sphere radius          : 3.7973
+HEADER 4  - Mean alpha-sphere Solvent Acc.    : 0.5192
+HEADER 5  - Mean B-factor of pocket residues  : 0.4683
+HEADER 6  - Hydrophobicity Score              : -10.3333
+HEADER 7  - Polarity Score                    :     3
+HEADER 8  - Amino Acid based volume Score     : 3.5000
+HEADER 9  - Pocket volume (Monte Carlo)       : 206.7180
+HEADER 10  -Pocket volume (convex hull)       : 3.9477
+HEADER 11 - Charge Score                      :    -1
+HEADER 12 - Local hydrophobic density Score   : 9.0000
+HEADER 13 - Number of apolar alpha sphere     :    10
+HEADER 14 - Proportion of apolar alpha sphere : 0.6250
+ATOM   4950    N ASN B 274      68.326 -11.495   3.573  0.00  0.00           N 0
+ATOM   4957  ND2 ASN B 274      68.193 -14.634   4.801  0.38  6.56           N 0
+ATOM   4980  CG2 THR B 277      73.085 -15.183   4.557  0.00  0.00           C 0
+ATOM   4978   CB THR B 277      71.986 -14.717   5.515  0.00  0.00           C 0
+ATOM   4953    O ASN B 274      70.247 -11.394   5.463  0.57  6.43           O 0
+ATOM   4538   CG PRO B 222      74.407 -13.475   1.336  0.00  0.00           C 0
+ATOM   4935    O PRO B 272      67.940 -12.924  -1.101  0.00  0.00           O 0
+ATOM   4539   CD PRO B 222      74.163 -12.157   0.601  0.00  0.00           C 0
+ATOM   4946  CD2 PHE B 273      70.699 -10.540  -0.627  0.00  0.00           C 0
+ATOM   4948  CE2 PHE B 273      71.348 -10.464  -1.868  0.00  0.00           C 0
+ATOM   4537   CB PRO B 222      75.702 -13.929   0.672  0.00  0.00           C 0
+ATOM   4547  OD2 ASP B 223      75.851 -13.335  -5.363  0.41  9.64           O 0
+ATOM   4545   CG ASP B 223      76.769 -13.485  -4.527  0.00  0.00           C 0
+ATOM   4940   CA PHE B 273      67.967 -11.425   1.173  0.00  0.00           C 0
+TER
+END

@@ -3,32 +3,32 @@ import pytest
 
 
 def test_subprocess_task_no_filehandles(tmpdir):
-    sk = tasks.SubprocessTask('cat file.txt')
-    sk.set_inputs(['file.txt'])
+    sk = tasks.SubprocessTask("cat file.txt")
+    sk.set_inputs(["file.txt"])
     sk.set_outputs([tasks.STDOUT])
-    p = tmpdir.mkdir('sub').join("hello.txt")
+    p = tmpdir.mkdir("sub").join("hello.txt")
     p.write("content")
     result = sk.run(p)
-    assert result == 'content'
+    assert result == "content"
 
 
 def test_subprocess_task_stdout(tmpdir):
-    sk = tasks.SubprocessTask('cat file.txt')
-    sk.set_inputs(['file.txt'])
+    sk = tasks.SubprocessTask("cat file.txt")
+    sk.set_inputs(["file.txt"])
     sk.set_outputs([tasks.STDOUT])
-    p = tmpdir.mkdir('sub').join("hello.txt")
+    p = tmpdir.mkdir("sub").join("hello.txt")
     p.write("content")
     fh = filehandling.FileHandler()
     pf = fh.load(p)
     result = sk.run(pf)
-    assert result == 'content'
+    assert result == "content"
 
 
 def test_subprocess_task_fileout(tmpdir):
-    sk = tasks.SubprocessTask('cat file.txt > out.dat')
-    sk.set_inputs(['file.txt'])
-    sk.set_outputs(['out.dat'])
-    p = tmpdir.mkdir('sub').join("hello.txt")
+    sk = tasks.SubprocessTask("cat file.txt > out.dat")
+    sk.set_inputs(["file.txt"])
+    sk.set_outputs(["out.dat"])
+    p = tmpdir.mkdir("sub").join("hello.txt")
     p.write("content")
     fh = filehandling.FileHandler()
     pf = fh.load(p)
@@ -37,10 +37,10 @@ def test_subprocess_task_fileout(tmpdir):
 
 
 def test_subprocess_task_globinputs(tmpdir):
-    sk = tasks.SubprocessTask('cat *.txt > out.dat')
-    sk.set_inputs(['*.txt'])
-    sk.set_outputs(['out.dat'])
-    d = tmpdir.mkdir('sub')
+    sk = tasks.SubprocessTask("cat *.txt > out.dat")
+    sk.set_inputs(["*.txt"])
+    sk.set_outputs(["out.dat"])
+    d = tmpdir.mkdir("sub")
     p = d.join("file1.txt")
     q = d.join("file2.txt")
     p.write("content\n")
@@ -50,14 +50,14 @@ def test_subprocess_task_globinputs(tmpdir):
     result = sk.run(pf)
     r = d.join("output.dat")
     result.save(r)
-    assert r.read() == 'content\nmore content\n'
+    assert r.read() == "content\nmore content\n"
 
 
 def test_subprocess_task_globoutputs(tmpdir):
-    sk = tasks.SubprocessTask('split -l 1 input.txt')
-    sk.set_inputs(['input.txt'])
-    sk.set_outputs(['x*'])
-    d = tmpdir.mkdir('sub')
+    sk = tasks.SubprocessTask("split -l 1 input.txt")
+    sk.set_inputs(["input.txt"])
+    sk.set_outputs(["x*"])
+    d = tmpdir.mkdir("sub")
     p = d.join("lines.txt")
     p.write("line 1\nline 2\nline 3\n")
     fh = filehandling.FileHandler()
@@ -68,13 +68,13 @@ def test_subprocess_task_globoutputs(tmpdir):
 
 def test_subprocess_task_fails():
     with pytest.raises(tasks.XflowError):
-        sk = tasks.SubprocessTask('foo -bar')
+        sk = tasks.SubprocessTask("foo -bar")
         sk.set_outputs([tasks.STDOUT])
         sk.run()
 
 
 def test_subprocess_task_catch_fail():
-    sk = tasks.SubprocessTask('foo -bar')
+    sk = tasks.SubprocessTask("foo -bar")
     sk.set_outputs([tasks.DEBUGINFO])
     result = sk.run()
     assert isinstance(result, tasks.XflowError)
@@ -85,14 +85,14 @@ def test_function_task_basic():
         return a * b
 
     fk = tasks.FunctionTask(mult)
-    fk.set_inputs(['a', 'b'])
-    fk.set_outputs(['ab'])
+    fk.set_inputs(["a", "b"])
+    fk.set_outputs(["ab"])
     result = fk.run(3, 4)
     assert result == 12
 
 
 def test_function_task_with_filehandles(tmpdir):
-    d = tmpdir.mkdir('sub')
+    d = tmpdir.mkdir("sub")
     p = d.join("lines.txt")
     p.write("line 1\nline 2\nline 3\n")
     fh = filehandling.FileHandler()
@@ -104,14 +104,14 @@ def test_function_task_with_filehandles(tmpdir):
         return len(lines)
 
     fk = tasks.FunctionTask(linecount)
-    fk.set_inputs(['a'])
-    fk.set_outputs(['nlines'])
+    fk.set_inputs(["a"])
+    fk.set_outputs(["nlines"])
     result = fk.run(pf)
     assert result == 3
 
 
 def test_function_task_no_filehandles(tmpdir):
-    d = tmpdir.mkdir('sub')
+    d = tmpdir.mkdir("sub")
     p = d.join("lines.txt")
     p.write("line 1\nline 2\nline 3\n")
 
@@ -121,7 +121,7 @@ def test_function_task_no_filehandles(tmpdir):
         return len(lines)
 
     fk = tasks.FunctionTask(linecount)
-    fk.set_inputs(['a'])
-    fk.set_outputs(['nlines'])
+    fk.set_inputs(["a"])
+    fk.set_outputs(["nlines"])
     result = fk.run(p)
     assert result == 3

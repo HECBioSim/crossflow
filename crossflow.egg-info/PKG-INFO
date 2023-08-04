@@ -1,0 +1,38 @@
+Metadata-Version: 2.1
+Name: crossflow
+Version: 0.1.2rc0
+Summary: A Python workflows system
+Home-page: 
+Author: Charlie Laughton
+Author-email: charles.laughton@nottingham.ac.uk
+License: MIT license.
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: Environment :: Console
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Topic :: Scientific/Engineering
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: Unix
+License-File: LICENSE.txt
+
+# Crossflow
+
+A Python-based workflow system.
+
+Crossflow allows you to build and execute complex workflows that chain together 
+command-line driven tools.
+
+For details, see the [Wiki](https://bitbucket.org/claughton/crossflow/wiki/Home).
+
+### Authors:
+
+Charlie Laughton [charles.laughton@nottingham.ac.uk](mailto:charles.laughton@nottingham.ac.uk)
+
+Christian Suess [christian.suess@nottingham.ac.uk](mailto:christian.suess@nottingham.ac.uk)

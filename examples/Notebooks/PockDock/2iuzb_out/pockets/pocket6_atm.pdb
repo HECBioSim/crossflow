@@ -1,0 +1,41 @@
+HEADER
+HEADER This is a pdb format file writen by the programm fpocket.                 
+HEADER It represents the atoms contacted by the voronoi vertices of the pocket.  
+HEADER                                                                           
+HEADER Information about the pocket     6:
+HEADER 0  - Pocket Score                      : 0.0264
+HEADER 1  - Drug Score                        : 0.0004
+HEADER 2  - Number of alpha spheres           :    16
+HEADER 3  - Mean alpha-sphere radius          : 4.0774
+HEADER 4  - Mean alpha-sphere Solvent Acc.    : 0.7454
+HEADER 5  - Mean B-factor of pocket residues  : 0.4915
+HEADER 6  - Hydrophobicity Score              : 21.2857
+HEADER 7  - Polarity Score                    :     4
+HEADER 8  - Amino Acid based volume Score     : 3.8571
+HEADER 9  - Pocket volume (Monte Carlo)       : 289.0118
+HEADER 10  -Pocket volume (convex hull)       : 12.3126
+HEADER 11 - Charge Score                      :     0
+HEADER 12 - Local hydrophobic density Score   : 9.0000
+HEADER 13 - Number of apolar alpha sphere     :    10
+HEADER 14 - Proportion of apolar alpha sphere : 0.6250
+ATOM   5282    O GLY B 319      58.279  11.055  -5.058  0.37  6.43           O 0
+ATOM   5344  CH2 TRP B 326      55.061   8.531  -4.354  0.00  0.00           C 0
+ATOM   5343  CZ3 TRP B 326      55.463   9.253  -3.209  0.00  0.00           C 0
+ATOM   5277  OE1 GLN B 318      55.084  11.820  -9.483  0.00  0.00           O 0
+ATOM   5276   CD GLN B 318      54.594  10.724  -9.788  0.00  0.00           C 0
+ATOM   5278  NE2 GLN B 318      53.348  10.600 -10.238  0.35  9.84           N 0
+ATOM   5274   CB GLN B 318      55.976   9.158  -8.267  0.00  0.00           C 0
+ATOM   5270    N GLN B 318      55.974   6.712  -8.423  0.66  2.19           N 0
+ATOM   5275   CG GLN B 318      55.410   9.420  -9.678  0.00  0.00           C 0
+ATOM   5574  CD2 PHE B 356      52.337   2.946  -3.993  0.00  0.00           C 0
+ATOM   5557  ND2 ASN B 354      47.011   3.702  -5.431  0.55  7.66           N 0
+ATOM   5573  CD1 PHE B 356      52.560   1.907  -6.139  0.00  0.00           C 0
+ATOM   5572   CG PHE B 356      51.869   2.037  -4.943  0.00  0.00           C 0
+ATOM   5575  CE1 PHE B 356      53.705   2.685  -6.396  0.00  0.00           C 0
+ATOM   5577   CZ PHE B 356      54.160   3.596  -5.443  0.00  0.00           C 0
+ATOM   5267   CA GLY B 317      55.530   4.476  -9.279  0.00  0.00           C 0
+ATOM   5576  CE2 PHE B 356      53.482   3.729  -4.238  0.00  0.00           C 0
+ATOM   5401  OE1 GLN B 333      51.926   5.842  -1.826  0.61  6.43           O 0
+ATOM   5342  CZ2 TRP B 326      55.479   7.239  -4.571  0.00  0.00           C 0
+TER
+END

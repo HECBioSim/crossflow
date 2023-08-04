@@ -1,0 +1,41 @@
+HEADER
+HEADER This is a pdb format file writen by the programm fpocket.                 
+HEADER It represents the atoms contacted by the voronoi vertices of the pocket.  
+HEADER                                                                           
+HEADER Information about the pocket     5:
+HEADER 0  - Pocket Score                      : 0.0559
+HEADER 1  - Drug Score                        : 0.0035
+HEADER 2  - Number of alpha spheres           :    21
+HEADER 3  - Mean alpha-sphere radius          : 3.6898
+HEADER 4  - Mean alpha-sphere Solvent Acc.    : 0.4574
+HEADER 5  - Mean B-factor of pocket residues  : 0.5353
+HEADER 6  - Hydrophobicity Score              : 33.8889
+HEADER 7  - Polarity Score                    :     5
+HEADER 8  - Amino Acid based volume Score     : 4.3333
+HEADER 9  - Pocket volume (Monte Carlo)       : 238.2425
+HEADER 10  -Pocket volume (convex hull)       : 6.4811
+HEADER 11 - Charge Score                      :    -2
+HEADER 12 - Local hydrophobic density Score   : 14.7500
+HEADER 13 - Number of apolar alpha sphere     :    16
+HEADER 14 - Proportion of apolar alpha sphere : 0.7619
+ATOM   3547  CD1 ILE B  95      84.692  25.571   0.975  0.00  0.00           C 0
+ATOM   3489   CG MET B  88      85.291  18.716   0.981  0.00  0.00           C 0
+ATOM   3488   CB MET B  88      84.502  18.897  -0.331  0.00  0.00           C 0
+ATOM   6089   OH TYR B 424      88.109  25.236   2.697  0.69  6.43           O 0
+ATOM   3546  CG2 ILE B  95      83.318  23.990   3.085  0.00  0.00           C 0
+ATOM   3536   CB ASP B  94      80.972  21.471   1.273  0.00  0.00           C 0
+ATOM   4115  CD2 LEU B 167      86.456  21.975   5.402  0.00  0.00           C 0
+ATOM   4114  CD1 LEU B 167      86.195  19.639   4.485  0.00  0.00           C 0
+ATOM   4082  CD2 LEU B 163      89.272  18.167   2.023  0.00  0.00           C 0
+ATOM   3487    O MET B  88      84.508  18.276  -3.544  0.64  2.14           O 0
+ATOM   3508   CA SER B  91      81.174  23.976  -2.442  0.00  0.00           C 0
+ATOM   3511   CB SER B  91      82.007  24.899  -3.359  0.00  0.00           C 0
+ATOM   3507    N SER B  91      80.680  22.812  -3.167  0.53  2.19           N 0
+ATOM   3539  OD2 ASP B  94      81.447  19.730  -0.267  0.00  0.00           O 0
+ATOM   4107  OD2 ASP B 166      92.422  22.113   4.754  0.50  5.36           O 0
+ATOM   6077  NE2 GLN B 423      91.927  24.516   2.814  0.15  2.19           N 0
+ATOM   4104   CB ASP B 166      90.745  21.916   6.380  0.00  0.00           C 0
+ATOM   4113   CG LEU B 167      86.785  20.497   5.616  0.00  0.00           C 0
+ATOM   6087  CE2 TYR B 424      88.383  24.880   5.064  0.00  0.00           C 0
+TER
+END

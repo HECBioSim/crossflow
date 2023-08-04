@@ -3,32 +3,32 @@ import pytest
 
 
 def test_subprocess_kernel_no_filehandles(tmpdir):
-    sk = kernels.SubprocessKernel('cat file.txt')
-    sk.set_inputs(['file.txt'])
+    sk = kernels.SubprocessKernel("cat file.txt")
+    sk.set_inputs(["file.txt"])
     sk.set_outputs([kernels.STDOUT])
-    p = tmpdir.mkdir('sub').join("hello.txt")
+    p = tmpdir.mkdir("sub").join("hello.txt")
     p.write("content")
     result = sk.run(p)
-    assert result == 'content'
+    assert result == "content"
 
 
 def test_subprocess_kernel_stdout(tmpdir):
-    sk = kernels.SubprocessKernel('cat file.txt')
-    sk.set_inputs(['file.txt'])
+    sk = kernels.SubprocessKernel("cat file.txt")
+    sk.set_inputs(["file.txt"])
     sk.set_outputs([kernels.STDOUT])
-    p = tmpdir.mkdir('sub').join("hello.txt")
+    p = tmpdir.mkdir("sub").join("hello.txt")
     p.write("content")
     fh = filehandling.FileHandler()
     pf = fh.load(p)
     result = sk.run(pf)
-    assert result == 'content'
+    assert result == "content"
 
 
 def test_subprocess_kernel_fileout(tmpdir):
-    sk = kernels.SubprocessKernel('cat file.txt > out.dat')
-    sk.set_inputs(['file.txt'])
-    sk.set_outputs(['out.dat'])
-    p = tmpdir.mkdir('sub').join("hello.txt")
+    sk = kernels.SubprocessKernel("cat file.txt > out.dat")
+    sk.set_inputs(["file.txt"])
+    sk.set_outputs(["out.dat"])
+    p = tmpdir.mkdir("sub").join("hello.txt")
     p.write("content")
     fh = filehandling.FileHandler()
     pf = fh.load(p)
@@ -37,10 +37,10 @@ def test_subprocess_kernel_fileout(tmpdir):
 
 
 def test_subprocess_kernel_globinputs(tmpdir):
-    sk = kernels.SubprocessKernel('cat *.txt > out.dat')
-    sk.set_inputs(['*.txt'])
-    sk.set_outputs(['out.dat'])
-    d = tmpdir.mkdir('sub')
+    sk = kernels.SubprocessKernel("cat *.txt > out.dat")
+    sk.set_inputs(["*.txt"])
+    sk.set_outputs(["out.dat"])
+    d = tmpdir.mkdir("sub")
     p = d.join("file1.txt")
     q = d.join("file2.txt")
     p.write("content\n")
@@ -50,14 +50,14 @@ def test_subprocess_kernel_globinputs(tmpdir):
     result = sk.run(pf)
     r = d.join("output.dat")
     result.save(r)
-    assert r.read() == 'content\nmore content\n'
+    assert r.read() == "content\nmore content\n"
 
 
 def test_subprocess_kernel_globoutputs(tmpdir):
-    sk = kernels.SubprocessKernel('split -l 1 input.txt')
-    sk.set_inputs(['input.txt'])
-    sk.set_outputs(['x*'])
-    d = tmpdir.mkdir('sub')
+    sk = kernels.SubprocessKernel("split -l 1 input.txt")
+    sk.set_inputs(["input.txt"])
+    sk.set_outputs(["x*"])
+    d = tmpdir.mkdir("sub")
     p = d.join("lines.txt")
     p.write("line 1\nline 2\nline 3\n")
     fh = filehandling.FileHandler()
@@ -68,13 +68,13 @@ def test_subprocess_kernel_globoutputs(tmpdir):
 
 def test_subprocess_kernel_fails():
     with pytest.raises(kernels.XflowError):
-        sk = kernels.SubprocessKernel('foo -bar')
+        sk = kernels.SubprocessKernel("foo -bar")
         sk.set_outputs([kernels.STDOUT])
         sk.run()
 
 
 def test_subprocess_kernel_catch_fail():
-    sk = kernels.SubprocessKernel('foo -bar')
+    sk = kernels.SubprocessKernel("foo -bar")
     sk.set_outputs([kernels.DEBUGINFO])
     result = sk.run()
     assert isinstance(result, kernels.XflowError)
@@ -85,14 +85,14 @@ def test_function_kernel_basic():
         return a * b
 
     fk = kernels.FunctionKernel(mult)
-    fk.set_inputs(['a', 'b'])
-    fk.set_outputs(['ab'])
+    fk.set_inputs(["a", "b"])
+    fk.set_outputs(["ab"])
     result = fk.run(3, 4)
     assert result == 12
 
 
 def test_function_kernel_with_filehandles(tmpdir):
-    d = tmpdir.mkdir('sub')
+    d = tmpdir.mkdir("sub")
     p = d.join("lines.txt")
     p.write("line 1\nline 2\nline 3\n")
     fh = filehandling.FileHandler()
@@ -104,14 +104,14 @@ def test_function_kernel_with_filehandles(tmpdir):
         return len(lines)
 
     fk = kernels.FunctionKernel(linecount)
-    fk.set_inputs(['a'])
-    fk.set_outputs(['nlines'])
+    fk.set_inputs(["a"])
+    fk.set_outputs(["nlines"])
     result = fk.run(pf)
     assert result == 3
 
 
 def test_function_kernel_no_filehandles(tmpdir):
-    d = tmpdir.mkdir('sub')
+    d = tmpdir.mkdir("sub")
     p = d.join("lines.txt")
     p.write("line 1\nline 2\nline 3\n")
 
@@ -121,7 +121,7 @@ def test_function_kernel_no_filehandles(tmpdir):
         return len(lines)
 
     fk = kernels.FunctionKernel(linecount)
-    fk.set_inputs(['a'])
-    fk.set_outputs(['nlines'])
+    fk.set_inputs(["a"])
+    fk.set_outputs(["nlines"])
     result = fk.run(p)
     assert result == 3
