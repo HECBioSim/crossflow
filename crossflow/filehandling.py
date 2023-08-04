@@ -45,7 +45,10 @@ class FileHandler(object):
             self.stage_point = stage_point
 
     def load(self, path):
-        return FileHandle(path, self.stage_point)
+        return FileHandle(path, self.stage_point, must_exist=True)
+
+    def create(self, path):
+        return FileHandle(path, self.stage_point, must_exist=False)
 
 
 class FileHandle(object):
@@ -53,33 +56,45 @@ class FileHandle(object):
     A portable container for a file.
     """
 
-    def __init__(self, path, stage_point):
+    def __init__(self, path, stage_point, must_exist=True):
         if not isinstance(path, (os.PathLike, str, bytes)):
             raise IOError(
                 f'Error - illegal argument type {type(path)} for {path}'
                 )
-        if not os.path.exists(path):
-            raise IOError('Error - no such file')
-        source = fsspec.open(path)
-        ext = os.path.splitext(path)[1]
-        self.path = path
-        self.uid = str(uuid.uuid4()) + ext
-        self.local_path = None
-        if stage_point is None:
-            self.staging_path = None
-            with source as s:
-                self.store = zlib.compress(s.read())
+        if must_exist:
+            if not os.path.exists(path):
+                raise IOError('Error - no such file')
+            source = fsspec.open(path)
+            ext = os.path.splitext(path)[1]
+            self.path = path
+            self.uid = str(uuid.uuid4()) + ext
+            self.local_path = None
+            if stage_point is None:
+                self.staging_path = None
+                with source as s:
+                    self.store = zlib.compress(s.read())
+            else:
+                self.staging_path = op.join(stage_point, self.uid)
+                self.store = fsspec.open(
+                    self.staging_path, 'wb', compression='bz2'
+                    )
+                with source as s:
+                    with self.store as d:
+                        d.write(s.read())
+                source.close()
+                self.store.close()
+                self.store.mode = 'rb'
         else:
-            self.staging_path = op.join(stage_point, self.uid)
-            self.store = fsspec.open(
-                self.staging_path, 'wb', compression='bz2'
-                )
-            with source as s:
-                with self.store as d:
-                    d.write(s.read())
-            source.close()
-            self.store.close()
-            self.store.mode = 'rb'
+            if os.path.exists(path):
+                    raise IOError('Error - file already exists')
+            ext = os.path.splitext(path)[1]
+            self.uid = str(uuid.uuid4()) + ext
+            self.local_path = None
+            if stage_point is None:
+                self.staging_path = None
+            else:
+                self.staging_path = op.join(stage_point, self.uid)
+            self.store = None
 
     def __str__(self):
         return self.__fspath__()
@@ -129,6 +144,9 @@ class FileHandle(object):
 
     def read_binary(self):
         source = self.store
+        if source == None:
+            return ''.encode('utf-8')
+
         if self.staging_path is None:
             data = zlib.decompress(source)
         else:
@@ -138,3 +156,19 @@ class FileHandle(object):
 
     def read_text(self):
         return self.read_binary().decode()
+
+    def write_binary(self, data):
+        compressed_data = zlib.compress(data)
+        if self.staging_path is None:
+            self.store = compressed_data
+        else:
+            self.store = fsspec.open(
+                    self.staging_path, 'wb', compression='bz2'
+                    )
+            self.store.write(data)
+            self.store.close()
+            self.store.mode = 'rb'
+
+    def write_text(self, text):
+        self.write_binary(text.encode('utf-8'))
+
