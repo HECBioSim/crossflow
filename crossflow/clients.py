@@ -2,7 +2,10 @@
 Clients.py: thin wrapper over dask client
 """
 import glob
+import pickle
+import sys
 from dask.distributed import Client as DaskClient
+from dask.distributed import Future
 from collections import Iterable
 from .kernels import FunctionKernel, SubprocessKernel
 from .tasks import FunctionTask, SubprocessTask
@@ -33,6 +36,35 @@ class Client(DaskClient):
         except IOError:
             pass
         return self.scatter(some_object, broadcast=True)
+
+    def _rough_size(self, item):
+        """
+        Get the approximate size of an item, to decide if
+        it should be uploaded to the workers in advance
+
+        """
+        x = pickle.dumps(item)
+        return sys.getsizeof(x)
+
+    def _futurize(self, item):
+        """
+        Upload an item, if it's not already a Future
+
+        """
+        if isinstance(item, Future):
+            return item
+        else:
+            if isinstance(item, list):
+                for i, j in enumerate(item):
+                    if not isinstance(j, Future):
+                        if self._rough_size(j) > 10000:
+                            item[i] = self.upload(j)
+                return item
+            else:
+                if self._rough_size(item) > 10000:
+                    return self.upload(item)
+                else:
+                    return item
 
     def _unpack(self, task, future):
         """
@@ -148,6 +180,12 @@ class Client(DaskClient):
             future or tuple of futures
         """
         newargs = self._filehandlify(args)
+        if isinstance(newargs, list):
+            for i, arg in enumerate(newargs):
+                newargs[i] = self._futurize(arg)
+        else:
+            newargs = self._futurize(newargs)
+
         if isinstance(func, (SubprocessKernel, FunctionKernel,
                              SubprocessTask, FunctionTask)):
             kwargs['pure'] = False
@@ -193,10 +231,13 @@ class Client(DaskClient):
             else:
                 its.append([iterable] * maxlen)
         newits = self._filehandlify(its)
+        for i, arg in enumerate(newits):
+            newits[i] = self._futurize(arg)
+
         kwargs['pure'] = False
         if isinstance(func, (SubprocessKernel, FunctionKernel,
                              SubprocessTask, FunctionTask)):
-            futures = super().map(func.run, *newits, **kwargs)
+            futures = super().map(func, *newits, **kwargs)
             result = [self._unpack(func, future) for future in futures]
         else:
             result = super().map(func, *its, **kwargs)

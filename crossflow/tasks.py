@@ -58,6 +58,9 @@ class SubprocessTask(object):
         for key in re.findall(r'{.*?}', self.template):
             self.variables.append(key[1:-1])
 
+    def __call__(self, *args):
+        return self.run(*args)
+
     def set_inputs(self, inputs):
         """
         Set the inputs the task requires
@@ -188,6 +191,9 @@ class FunctionTask(object):
         self.constants = {}
         self.tmpdir = None
         self.filehandler = FileHandler(config.stage_point)
+
+    def __cal__(self, *args):
+        return self.run(*args)
 
     def set_inputs(self, inputs):
         """
