@@ -199,7 +199,7 @@ class FunctionTask(object):
         self.tmpdir = None
         self.filehandler = FileHandler(config.stage_point)
 
-    def __cal__(self, *args):
+    def __call__(self, *args):
         return self.run(*args)
 
     def set_inputs(self, inputs):
