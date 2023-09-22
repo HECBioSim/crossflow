@@ -218,12 +218,12 @@ class Client(DaskClient):
         its = []
         maxlen = 0
         for iterable in iterables:
-            if isinstance(iterable, list):
+            if isinstance(iterable, (list, tuple)):
                 n_items = len(iterable)
                 if n_items > maxlen:
                     maxlen = n_items
         for iterable in iterables:
-            if isinstance(iterable, list):
+            if isinstance(iterable, (list, tuple)):
                 n_items = len(iterable)
                 if n_items != maxlen:
                     raise ValueError(
