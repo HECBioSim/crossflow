@@ -5,7 +5,7 @@ A Python-based workflow system.
 Crossflow allows you to build and execute complex workflows that chain together 
 command-line driven tools.
 
-For details, see the [Wiki](https://github.com/CharlieLaughton/crossflow/wiki)].
+For details, see the [Wiki](https://github.com/CharlieLaughton/crossflow/wiki).
 
 ### Authors:
 
