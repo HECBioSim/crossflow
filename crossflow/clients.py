@@ -232,17 +232,20 @@ class Client(DaskClient):
                 its.append(iterable)
             else:
                 its.append([iterable] * maxlen)
-        newits = self._filehandlify(its)
-        for i, arg in enumerate(newits):
-            newits[i] = self._futurize(arg)
 
         kwargs['pure'] = False
         if isinstance(func, (SubprocessKernel, FunctionKernel,
                              SubprocessTask, FunctionTask)):
-            futures = super().map(func, *newits, **kwargs)
+            newits = self._filehandlify(its)
+            for i, arg in enumerate(newits):
+                newits[i] = self._futurize(arg)
+
+            #futures = super().map(func, *newits, **kwargs)
+            futures = [super().submit(func, *newit, **kwargs) for newit in zip(*newits)]
             result = [self._unpack(func, future) for future in futures]
         else:
-            result = super().map(func, *its, **kwargs)
+            #result = super().map(func, *its, **kwargs)
+            result = [super().submit(func, *it, **kwargs) for it in zip(*its)]
         if isinstance(result[0], tuple):
             result = self._lt2tl(result)
         return result
