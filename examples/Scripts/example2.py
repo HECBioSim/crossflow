@@ -17,18 +17,23 @@ def run(client):
     input_file1.write_text('content\n')
     input_file2 = here / 'file2.txt'
     input_file2.write_text('more content\n')
+
     # Create a Subprocesstask that will join input files together:
     joiner = tasks.SubprocessTask('cat * > output')
     joiner.set_inputs(['*'])
     joiner.set_outputs(['output'])
+
     # The task expects an arbitrary number of input files, so put the inputs
     # into a list:
     inputs = [input_file1, input_file2]
+
     # Send the job to the client via the submit() method:
     output = client.submit(joiner, inputs)
+
     # The client returns outputs as Futures, so call their result() method
     # to get the actual data:
     output_filehandle = output.result()
+
     # Save the output FileHandle object as a file, and list its contents:
     output_file = here / 'joined.txt'
     output_filehandle.save(output_file)
