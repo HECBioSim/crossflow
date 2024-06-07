@@ -97,7 +97,7 @@ class Client(DaskClient):
         work through an argument list, converting paths to filehandles
         where possible.
         """
-        if isinstance(args, list):
+        if isinstance(args, Iterable):
             newargs = []
             for a in args:
                 if isinstance(a, list):
