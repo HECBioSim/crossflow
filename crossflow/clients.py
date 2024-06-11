@@ -10,7 +10,6 @@ try:
 except ImportError:
     from collections.abc import Iterable
 from dask.distributed import Future
-from .kernels import FunctionKernel, SubprocessKernel
 from .tasks import FunctionTask, SubprocessTask
 from .filehandling import FileHandler
 from . import config
@@ -79,8 +78,8 @@ class Client(DaskClient):
         should properly return.
 
         args:
-            task (Task or Kernel): the task/kernel that generated the future
-            future (Future): the future returned by kernel
+            task (Task): the task that generated the future
+            future (Future): the future returned by task
 
         returns:
             future or tuple of futures.
@@ -175,7 +174,7 @@ class Client(DaskClient):
         futures, rather than just one future, is returned.
 
         args:
-            func (function/kernel): the function to be run
+            func (function/task): the function to be run
             args (list): the function arguments
             kwargs (dict): keyword arguments to submit()
         returns:
@@ -188,8 +187,7 @@ class Client(DaskClient):
         else:
             newargs = self._futurize(newargs)
 
-        if isinstance(func, (SubprocessKernel, FunctionKernel,
-                             SubprocessTask, FunctionTask)):
+        if isinstance(func, (SubprocessTask, FunctionTask)):
             kwargs['pure'] = False
             future = super().submit(func.run, *newargs, **kwargs)
             return self._unpack(func, future)
@@ -234,8 +232,7 @@ class Client(DaskClient):
                 its.append([iterable] * maxlen)
 
         kwargs['pure'] = False
-        if isinstance(func, (SubprocessKernel, FunctionKernel,
-                             SubprocessTask, FunctionTask)):
+        if isinstance(func, (SubprocessTask, FunctionTask)):
             newits = self._filehandlify(its)
             for i, arg in enumerate(newits):
                 newits[i] = self._futurize(arg)

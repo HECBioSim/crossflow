@@ -165,8 +165,8 @@ class FileHandle(object):
             self.store = fsspec.open(
                 self.staging_path, "wb", compression="bz2"
             )
-            self.store.write(data)
-            self.store.close()
+            with self.store as s:
+                s.write(data)
             self.store.mode = "rb"
 
     def write_text(self, text):
