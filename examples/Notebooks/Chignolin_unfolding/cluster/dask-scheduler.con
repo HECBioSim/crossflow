@@ -1,0 +1,13 @@
+getenv   = true
+output   = condor.out
+error    = condor.err
+log      = condor.log
+
+universe = vanilla
+
+
+executable = /path/to/dask-scheduler
+arguments = "--scheduler-file dask.dat --port 8765"
+
+queue
+

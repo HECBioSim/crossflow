@@ -1,0 +1,16 @@
+getenv   = true
+output   = condor_w.out
+error    = condor_w.err
+log      = condor_w.log
+
+universe = vanilla
+
+
+executable = /path/to/dask-worker
+arguments = "--scheduler-file dask.dat --nthreads 1 --nprocs 1"
+
++RequiresGPU = True
+Requirements     = Target.GPU =?= True
+Rank             = GPU_speed
+
+queue 2

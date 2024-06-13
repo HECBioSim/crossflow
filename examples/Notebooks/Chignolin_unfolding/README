@@ -1,0 +1,21 @@
+Example of a Weighted Ensemble simulation using Crossflow.
+The example corresponds to the "chignolin unfolding" example
+in the WESTPA tutorials.
+
+Dependencies:
+
+AMBER (PMEMD) installed on the worker nodes
+Python packages: numpy, mdtraj, crossflow
+
+Prerequisites:
+
+A Dask cluster up and running (see ./cluster folder for an example)
+
+To run:
+
+% python WE_unfolding.py
+
+should do it.
+
+Charlie Laughton
+1/21

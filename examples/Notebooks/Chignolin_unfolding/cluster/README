@@ -1,0 +1,3 @@
+Example scripts to lanch a Dask Scheduler and a number of Dask workers 
+on a Condor cluster. The scheduler writes a file "scheduler.json" that
+client programs can then use to get their connection to the cluster.
