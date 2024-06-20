@@ -1,0 +1,5 @@
+#!/bin/bash
+#
+# wrapper round dask-worker so it sees just one of the available GPUs:
+gpu=`nvidia-smi -L | awk '$1 ~ /MIG/ {print $6}' | sed 's/)//' | head -n $(( $SLURM_PROCID + 1 )) | tail -1`
+CUDA_VISIBLE_DEVICES=$gpu dask-worker --nworkers 1 --scheduler-file scheduler.json --resources GPU=1
