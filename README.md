@@ -9,7 +9,7 @@ For details, see the [Wiki](https://github.com/CharlieLaughton/crossflow/wiki).
 
 ### Releases:
 
-https://zenodo.org/account/settings/github/repository/CharlieLaughton/crossflow
+[![DOI](https://zenodo.org/badge/802170523.svg)](https://zenodo.org/doi/10.5281/zenodo.12191599)
 
 ### Authors:
 
