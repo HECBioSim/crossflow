@@ -11,7 +11,6 @@ def test_subprocess_task_no_filehandles(tmpdir):
     result = sk(p)
     assert result == "content"
 
-
 def test_subprocess_task_stdout(tmpdir):
     sk = tasks.SubprocessTask("cat file.txt")
     sk.set_inputs(["file.txt"])
@@ -127,7 +126,6 @@ def test_function_task_basic():
     fk.set_outputs(["ab"])
     result = fk.run(3, 4)
     assert result == 12
-
 
 def test_function_task_with_filehandles(tmpdir):
     d = tmpdir.mkdir("sub")
