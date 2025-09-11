@@ -239,6 +239,7 @@ class FunctionTask(object):
             Whatever the function returns, with output files converted
                 to FileHandle objects
         """
+        od = os.getcwd()
         td = tempfile.mkdtemp()
         os.chdir(td)
         indict = {}
@@ -284,7 +285,7 @@ class FunctionTask(object):
             else:
                 outputs.append(v)
             shutil.rmtree(td, ignore_errors=True)
-
+        os.chdir(od)
         if len(outputs) == 1:
             outputs = outputs[0]
         else:
