@@ -28,7 +28,7 @@ jobs:
         run: pip install -e .[testing]
 
       - name: Run test suite
-        run: pytest --cov crossflow --cov-report=xml term-missing --cov-append .
+        run: pytest --cov crossflow --cov-report=xml --cov-append .
 
       - name: Coveralls GitHub Action
         uses: coverallsapp/github-action@v2.3.6
