@@ -7,12 +7,14 @@ on:
 
 jobs:
   tests:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
     strategy:
       matrix:
+        #os: [macos-15, ubuntu-24.04, windows-2025]
+        os: [ubuntu-24.04, windows-2025]
         python-version: ["3.11", "3.12", "3.13"]
-    name: Run tests
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    name: Test on ${{ matrix.os }}-python-${{ matrix.python-version }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v5.0.0
@@ -26,11 +28,15 @@ jobs:
         run: pip install -e .[testing]
 
       - name: Run test suite
-        run: pytest --cov crossflow --cov-report term-missing --cov-append .
+        run: pytest --cov crossflow --cov-report=xml --cov-append .
 
       - name: Coveralls GitHub Action
         uses: coverallsapp/github-action@v2.3.6
         with:
+          flag-name: run-${{ join(matrix.*, '-') }}
+          parallel: true
+          format: cobertura
+          debug: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
   docs:
