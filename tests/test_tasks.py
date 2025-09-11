@@ -1,5 +1,6 @@
-from crossflow import filehandling, tasks
 import pytest
+
+from crossflow import filehandling, tasks
 
 
 def test_subprocess_task_no_filehandles(tmpdir):
@@ -10,6 +11,7 @@ def test_subprocess_task_no_filehandles(tmpdir):
     p.write("content")
     result = sk(p)
     assert result == "content"
+
 
 def test_subprocess_task_stdout(tmpdir):
     sk = tasks.SubprocessTask("cat file.txt")
@@ -22,6 +24,7 @@ def test_subprocess_task_stdout(tmpdir):
     result = sk(pf)
     assert result == "content"
 
+
 def test_subprocess_task_constant_filehandle(tmpdir):
     sk = tasks.SubprocessTask("cat file.txt")
     sk.set_inputs(["file.txt"])
@@ -30,7 +33,7 @@ def test_subprocess_task_constant_filehandle(tmpdir):
     p.write("content")
     fh = filehandling.FileHandler()
     pf = fh.load(p)
-    sk.set_constant('file.txt', pf)
+    sk.set_constant("file.txt", pf)
     result = sk()
     assert result == "content"
 
@@ -62,6 +65,7 @@ def test_subprocess_task_globinputs_2(tmpdir):
     r = d.join("output.dat")
     result.save(r)
     assert r.read() == "content\nmore content\n"
+
 
 def test_subprocess_task_globinputs_1(tmpdir):
     sk = tasks.SubprocessTask("cat *.txt > out.dat")
@@ -106,17 +110,19 @@ def test_subprocess_task_catch_fail():
     result = sk()
     assert isinstance(result, tasks.XflowError)
 
+
 def test_subprocesstask_with_constant():
     sk = tasks.SubprocessTask("head -{n} file.txt > out.dat")
     sk.set_inputs(["n", "file.txt"])
     sk.set_outputs(["out.dat"])
-    sk.set_constant('n', 1)
+    sk.set_constant("n", 1)
     fh = filehandling.FileHandler()
     pf = fh.create("tmp.txt")
-    pf.write_text('line 1\nline 2\nline 3')
+    pf.write_text("line 1\nline 2\nline 3")
     result = sk(pf)
-    assert result.read_text() == 'line 1\n'
-    
+    assert result.read_text() == "line 1\n"
+
+
 def test_function_task_basic():
     def mult(a, b):
         return a * b
@@ -126,6 +132,7 @@ def test_function_task_basic():
     fk.set_outputs(["ab"])
     result = fk.run(3, 4)
     assert result == 12
+
 
 def test_function_task_with_filehandles(tmpdir):
     d = tmpdir.mkdir("sub")
@@ -145,6 +152,7 @@ def test_function_task_with_filehandles(tmpdir):
     result = fk.run(pf)
     assert result == 3
 
+
 def test_function_task_with_output_filehandles(tmpdir):
     d = tmpdir.mkdir("sub")
     p = d.join("lines.txt")
@@ -155,15 +163,16 @@ def test_function_task_with_output_filehandles(tmpdir):
     def duplicate(a):
         with open(a) as f:
             data = f.read()
-        with open('out.dat', 'w') as f:
+        with open("out.dat", "w") as f:
             f.write(data)
-        return 'out.dat'
+        return "out.dat"
 
     fk = tasks.FunctionTask(duplicate)
     fk.set_inputs(["a"])
     fk.set_outputs(["out.dat"])
     result = fk.run(pf)
     assert isinstance(result, filehandling.FileHandle)
+
 
 def test_function_task_with_constant_filehandles(tmpdir):
     d = tmpdir.mkdir("sub")
@@ -180,7 +189,7 @@ def test_function_task_with_constant_filehandles(tmpdir):
     fk = tasks.FunctionTask(linecount)
     fk.set_inputs(["a"])
     fk.set_outputs(["nlines"])
-    fk.set_constant('a', pf)
+    fk.set_constant("a", pf)
     result = fk.run()
     assert result == 3
 
@@ -200,7 +209,7 @@ def test_function_task_with_filehandles_dict(tmpdir):
     fk = tasks.FunctionTask(linecount)
     fk.set_inputs(["a"])
     fk.set_outputs(["nlines"])
-    result = fk.run({'a':pf})
+    result = fk.run({"a": pf})
     assert result == 3
 
 

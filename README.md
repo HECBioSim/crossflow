@@ -13,7 +13,7 @@
 
 A Python-based workflow system.
 
-Crossflow allows you to build and execute complex workflows that chain together 
+Crossflow allows you to build and execute complex workflows that chain together
 command-line driven tools.
 
 
@@ -23,6 +23,6 @@ Charlie Laughton [charles.laughton@nottingham.ac.uk](mailto:charles.laughton@not
 
 Christian Suess
 
-James Gebbie-Rayet [james.gebbie@stfc.ac.uk](mailto:james.gebbie@stfc.ac.uk) 
+James Gebbie-Rayet [james.gebbie@stfc.ac.uk](mailto:james.gebbie@stfc.ac.uk)
 
 Sam Cox

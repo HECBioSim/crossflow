@@ -1,5 +1,6 @@
-from crossflow import filehandling
 import os.path as op
+
+from crossflow import filehandling
 
 
 def test_data_protocol(tmpdir):

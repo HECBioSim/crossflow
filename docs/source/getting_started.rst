@@ -11,7 +11,7 @@ Installation
 To install the released version:
 
 .. code-block:: bash
-    
+
     pip install crossflow
 
 To install the latest development version:

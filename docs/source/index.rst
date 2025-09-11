@@ -12,7 +12,7 @@ Crossflow allows you to build and execute complex workflows that chain together 
    clients
    filehandles
    examples
- 
+
 .. toctree::
    :maxdepth: 2
    :caption: Advanced:

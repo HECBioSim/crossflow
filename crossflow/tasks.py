@@ -2,17 +2,19 @@
 Crossflow tasks: wrappers round subprocess calls and python functions for
 execution on a crossflow cluster
 """
-import re
-import subprocess
-import os
-import os.path as op
-import tempfile
-import shutil
+
 import copy
 import glob
 from math import log10
-from .filehandling import FileHandler
+import os
+import os.path as op
+import re
+import shutil
+import subprocess
+import tempfile
+
 from . import config
+from .filehandling import FileHandler
 
 STDOUT = "STDOUT"
 DEBUGINFO = "DEBUGINFO"

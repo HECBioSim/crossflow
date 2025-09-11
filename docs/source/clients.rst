@@ -3,7 +3,7 @@ Crossflow Clients
 
 The ``crossflow.clients`` sub-package provides a Client through which
 one can execute tasks on distributed resources. At its heart a
-``crossflow.clients.Client()`` is a 
+``crossflow.clients.Client()`` is a
 `dask.distributed <https://distributed.dask.org/en/latest/>`_ client,
 and new users are strongly encouraged to read the documentation there to
 understand how Crossflow works.

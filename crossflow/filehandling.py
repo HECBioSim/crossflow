@@ -5,11 +5,13 @@ file system.
 """
 
 import os
-import zlib
 import os.path as op
-import uuid
-import fsspec
 import tempfile
+import uuid
+import zlib
+
+import fsspec
+
 from . import config
 
 """
@@ -58,9 +60,7 @@ class FileHandle(object):
 
     def __init__(self, path, stage_point, must_exist=True):
         if not isinstance(path, (os.PathLike, str, bytes)):
-            raise IOError(
-                f"Error - illegal argument type {type(path)} for {path}"
-            )
+            raise IOError(f"Error - illegal argument type {type(path)} for {path}")
         if must_exist:
             if not os.path.exists(path):
                 raise IOError("Error - no such file")
@@ -75,9 +75,7 @@ class FileHandle(object):
                     self.store = zlib.compress(s.read())
             else:
                 self.staging_path = op.join(stage_point, self.uid)
-                self.store = fsspec.open(
-                    self.staging_path, "wb", compression="bz2"
-                )
+                self.store = fsspec.open(self.staging_path, "wb", compression="bz2")
                 with source as s:
                     with self.store as d:
                         d.write(s.read())
@@ -162,9 +160,7 @@ class FileHandle(object):
         if self.staging_path is None:
             self.store = compressed_data
         else:
-            self.store = fsspec.open(
-                self.staging_path, "wb", compression="bz2"
-            )
+            self.store = fsspec.open(self.staging_path, "wb", compression="bz2")
             with self.store as s:
                 s.write(data)
             self.store.mode = "rb"

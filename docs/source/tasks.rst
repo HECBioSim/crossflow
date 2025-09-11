@@ -77,5 +77,4 @@ Although it is primarily expected that tasks will be run via a
 
    #!python
 
-   output, logfile = my_othertool('input1.dat', 'input2.dat') 
-
+   output, logfile = my_othertool('input1.dat', 'input2.dat')
