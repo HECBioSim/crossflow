@@ -1,0 +1,41 @@
+exclude: "^examples/|.*.ipynb"
+repos:
+  - repo: https://github.com/psf/black
+    rev: 25.1.0
+    hooks:
+      - id: black
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-ast
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        args: ["--profile=black"]
+
+  - repo: local
+    hooks:
+    - id: pylint
+      language: system
+      types: [file, python]
+      name: pylint
+      description: "This hook runs the pylint static code analyzer"
+      exclude: &exclude_files >
+        (?x)^(
+            docs/.*|
+            examples/.*|
+            tests/.*|
+        )$
+      entry: pylint

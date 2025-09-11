@@ -6,22 +6,23 @@
 # the associated client, this part of the process must be done in
 # __main__
 #
-from crossflow import clients, tasks
 from pathlib import Path
+
+from crossflow import clients, tasks
 
 
 def run(client):
     # Create two short text files:
-    here = Path('.')
-    input_file1 = here / 'file1.txt'
-    input_file1.write_text('content\n')
-    input_file2 = here / 'file2.txt'
-    input_file2.write_text('more content\n')
+    here = Path(".")
+    input_file1 = here / "file1.txt"
+    input_file1.write_text("content\n")
+    input_file2 = here / "file2.txt"
+    input_file2.write_text("more content\n")
 
     # Create a Subprocesstask that will join input files together:
-    joiner = tasks.SubprocessTask('cat * > output')
-    joiner.set_inputs(['*'])
-    joiner.set_outputs(['output'])
+    joiner = tasks.SubprocessTask("cat * > output")
+    joiner.set_inputs(["*"])
+    joiner.set_outputs(["output"])
 
     # The task expects an arbitrary number of input files, so put the inputs
     # into a list:
@@ -35,12 +36,12 @@ def run(client):
     output_filehandle = output.result()
 
     # Save the output FileHandle object as a file, and list its contents:
-    output_file = here / 'joined.txt'
+    output_file = here / "joined.txt"
     output_filehandle.save(output_file)
     return output_file
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Create a local compute cluster and the client to serve it:
     client = clients.Client()
     output_file = run(client)

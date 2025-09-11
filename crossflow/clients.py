@@ -1,18 +1,23 @@
 """
 Clients.py: thin wrapper over dask client
 """
+
 import glob
 import pickle
 import sys
+
 from dask.distributed import Client as DaskClient
+
 try:
     from collections import Iterable
 except ImportError:
     from collections.abc import Iterable
+
 from dask.distributed import Future
-from .tasks import FunctionTask, SubprocessTask
-from .filehandling import FileHandler
+
 from . import config
+from .filehandling import FileHandler
+from .tasks import FunctionTask, SubprocessTask
 
 
 class Client(DaskClient):
@@ -188,7 +193,7 @@ class Client(DaskClient):
             newargs = self._futurize(newargs)
 
         if isinstance(func, (SubprocessTask, FunctionTask)):
-            kwargs['pure'] = False
+            kwargs["pure"] = False
             future = super().submit(func.run, *newargs, **kwargs)
             return self._unpack(func, future)
         else:
@@ -224,24 +229,22 @@ class Client(DaskClient):
             if isinstance(iterable, (list, tuple)):
                 n_items = len(iterable)
                 if n_items != maxlen:
-                    raise ValueError(
-                        "Error: not all iterables are same length"
-                    )
+                    raise ValueError("Error: not all iterables are same length")
                 its.append(iterable)
             else:
                 its.append([iterable] * maxlen)
 
-        kwargs['pure'] = False
+        kwargs["pure"] = False
         if isinstance(func, (SubprocessTask, FunctionTask)):
             newits = self._filehandlify(its)
             for i, arg in enumerate(newits):
                 newits[i] = self._futurize(arg)
 
-            #futures = super().map(func, *newits, **kwargs)
+            # futures = super().map(func, *newits, **kwargs)
             futures = [super().submit(func, *newit, **kwargs) for newit in zip(*newits)]
             result = [self._unpack(func, future) for future in futures]
         else:
-            #result = super().map(func, *its, **kwargs)
+            # result = super().map(func, *its, **kwargs)
             result = [super().submit(func, *it, **kwargs) for it in zip(*its)]
         if isinstance(result[0], tuple):
             result = self._lt2tl(result)
