@@ -61,18 +61,7 @@ docs = [
 ]
 
 [tool.pylint.messages_control]
-disable = [
-    "no-else-return",
-    "missing-class-docstring",
-    "missing-function-docstring",
-    "missing-module-docstring",
-    "no-member",
-    "consider-using-dict-items",
-    "too-many-branches",
-    "too-many-nested-blocks",
-    "too-many-statements",
-    "raise-missing-from",
-]
+disable = []
 
 [tool.pylint.format]
 max-line-length = 120

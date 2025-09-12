@@ -1,5 +1,5 @@
 """
-Clients.py: thin wrapper over dask client
+clients.py: thin wrapper over dask client
 """
 
 from collections.abc import Iterable
@@ -54,17 +54,17 @@ class Client(DaskClient):
         Upload an item, if it's not already a Future
 
         """
-        if isinstance(item, Future):
+        if isinstance(item, Future):  # pylint: disable=no-else-return
             return item
         else:
-            if isinstance(item, list):
+            if isinstance(item, list):  # pylint: disable=no-else-return
                 for i, j in enumerate(item):
                     if not isinstance(j, Future):
                         if self._rough_size(j) > 10000:
                             item[i] = self.upload(j)
                 return item
             else:
-                if self._rough_size(item) > 10000:
+                if self._rough_size(item) > 10000:  # pylint: disable=no-else-return
                     return self.upload(item)
                 else:
                     return item
@@ -92,6 +92,9 @@ class Client(DaskClient):
         return tuple(outputs)
 
     def _filehandlify(self, args):
+        # pylint: disable=too-many-nested-blocks
+        # pylint: disable=too-many-branches
+        # pylint: disable=too-many-statements
         """
         work through an argument list, converting paths to filehandles
         where possible.
@@ -187,7 +190,9 @@ class Client(DaskClient):
         else:
             newargs = self._futurize(newargs)
 
-        if isinstance(func, (SubprocessTask, FunctionTask)):
+        if isinstance(  # pylint: disable=no-else-return
+            func, (SubprocessTask, FunctionTask)
+        ):
             kwargs["pure"] = False
             future = super().submit(func.run, *newargs, **kwargs)
             return self._unpack(func, future)

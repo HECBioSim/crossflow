@@ -34,10 +34,18 @@ from . import config
 
 
 def set_stage_point(stage_point):
+    """
+    A method to set the stage_point variable.
+    """
+
     config.STAGE_POINT = stage_point
 
 
 class FileHandler:
+    """
+    Handle file operations
+    """
+
     def __init__(self, stage_point=None):
         if stage_point is None:
             self.stage_point = config.STAGE_POINT
@@ -45,9 +53,17 @@ class FileHandler:
             self.stage_point = stage_point
 
     def load(self, path):
+        """
+        Method to load file.
+        """
+
         return FileHandle(path, self.stage_point, must_exist=True)
 
     def create(self, path):
+        """
+        Method to load file.
+        """
+
         return FileHandle(path, self.stage_point, must_exist=False)
 
 
@@ -77,7 +93,7 @@ class FileHandle:
                 with source as s:
                     with self.store as d:
                         d.write(s.read())
-                source.close()
+                source.close()  # pylint: disable=no-member
                 self.store.close()
                 self.store.mode = "rb"
         else:
@@ -114,7 +130,7 @@ class FileHandle:
             with source as s:
                 with dest as d:
                     d.write(s.read())
-        dest.close()
+        dest.close()  # pylint: disable=no-member
         return path
 
     def __fspath__(self):
@@ -124,7 +140,7 @@ class FileHandle:
         """
         if self.local_path is None:
             self.local_path = os.path.join(tempfile.gettempdir(), self.uid)
-        if not op.exists(self.local_path):
+        if not op.exists(self.local_path):  # pylint: disable=no-else-return
             return self.save(self.local_path)
         else:
             return self.local_path
@@ -139,6 +155,10 @@ class FileHandle:
                 pass
 
     def read_binary(self):
+        """
+        A method for reading binary file formats
+        """
+
         source = self.store
         if source is None:
             return "".encode("utf-8")
@@ -151,9 +171,17 @@ class FileHandle:
         return data
 
     def read_text(self):
+        """
+        A wrapper for reading binary formatted text.
+        """
+
         return self.read_binary().decode()
 
     def write_binary(self, data):
+        """
+        A method for writing binary file formats
+        """
+
         compressed_data = zlib.compress(data)
         if self.staging_path is None:
             self.store = compressed_data
@@ -164,4 +192,8 @@ class FileHandle:
             self.store.mode = "rb"
 
     def write_text(self, text):
+        """
+        A wrapper for writing binary formatted text.
+        """
+
         self.write_binary(text.encode("utf-8"))

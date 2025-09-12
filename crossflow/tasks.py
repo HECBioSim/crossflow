@@ -1,5 +1,5 @@
 """
-Crossflow tasks: wrappers round subprocess calls and python functions for
+tasks.py: wrappers round subprocess calls and python functions for
 execution on a crossflow cluster
 """
 
@@ -106,6 +106,8 @@ class SubprocessTask:
         return copy.deepcopy(self)
 
     def run(self, *args):
+        # pylint: disable=too-many-branches
+        # pylint: disable=too-many-statements
         """
         Run the task with the given inputs.
         Args:
@@ -157,7 +159,7 @@ class SubprocessTask:
         except subprocess.CalledProcessError as e:
             result = CalledProcessError(e)
             if DEBUGINFO not in self.outputs:
-                raise result
+                raise result  # pylint: disable=raise-missing-from
 
         self.stdout = result.stdout.decode()
         for outfile in self.outputs:
@@ -186,6 +188,10 @@ class SubprocessTask:
 
 
 class FunctionTask:
+    """
+    A task that runs a function
+    """
+
     def __init__(self, func):
         """
         Arguments:
@@ -229,6 +235,7 @@ class FunctionTask:
         return copy.copy(self)
 
     def run(self, *args):
+        # pylint: disable=too-many-branches
         """
         Run the task/function with the given arguments.
 
@@ -262,7 +269,7 @@ class FunctionTask:
                     indict[self.inputs[i]] = v.save(os.path.basename(v.path))
                 except AttributeError:
                     indict[self.inputs[i]] = v
-        for k in self.constants:
+        for k in self.constants:  # pylint: disable=consider-using-dict-items
             try:
                 indict[k] = self.constants[k].save(
                     os.path.basename(self.constants[k].path)
