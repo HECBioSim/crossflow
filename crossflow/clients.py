@@ -2,17 +2,12 @@
 Clients.py: thin wrapper over dask client
 """
 
+from collections.abc import Iterable
 import glob
 import pickle
 import sys
 
 from dask.distributed import Client as DaskClient
-
-try:
-    from collections import Iterable
-except ImportError:
-    from collections.abc import Iterable
-
 from dask.distributed import Future
 
 from . import config
@@ -26,7 +21,7 @@ class Client(DaskClient):
     """
 
     def __init__(self, *args, **kwargs):
-        self.filehandler = FileHandler(config.stage_point)
+        self.filehandler = FileHandler(config.STAGE_POINT)
         super().__init__(*args, **kwargs)
 
     def upload(self, some_object):
@@ -222,13 +217,8 @@ class Client(DaskClient):
         maxlen = 0
         for iterable in iterables:
             if isinstance(iterable, (list, tuple)):
-                n_items = len(iterable)
-                if n_items > maxlen:
-                    maxlen = n_items
-        for iterable in iterables:
-            if isinstance(iterable, (list, tuple)):
-                n_items = len(iterable)
-                if n_items != maxlen:
+                maxlen = max(maxlen, len(iterable))
+                if len(iterable) != maxlen:
                     raise ValueError("Error: not all iterables are same length")
                 its.append(iterable)
             else:

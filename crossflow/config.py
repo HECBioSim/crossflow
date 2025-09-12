@@ -1,1 +1,1 @@
-stage_point = None
+STAGE_POINT = None

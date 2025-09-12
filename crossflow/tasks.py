@@ -29,17 +29,17 @@ def _gen_filenames(pattern, n_files):
     fieldwidth = int(log10(n_files)) + 1
     if "*" in pattern:
         w = pattern.split("*")
-        template = "{}{{:0{}d}}{}".format(w[0], fieldwidth, w[1])
+        template = f"{w[0]}{{:0{fieldwidth}d}}{w[1]}"
     else:
         w = pattern.split("?")
         if pattern.count("?") < fieldwidth:
             raise ValueError("Error - too many files for this pattern")
-        template = "{}{{:0{}d}}{}".format(w[0], pattern.count("?"), w[-1])
+        template = f"{w[0]}{{:0{pattern.count('?')}d}}{w[-1]}"
     filenames = [template.format(i) for i in range(n_files)]
     return filenames
 
 
-class SubprocessTask(object):
+class SubprocessTask:
     """
     A task that runs a command-line executable
     """
@@ -53,8 +53,8 @@ class SubprocessTask(object):
         self.inputs = []
         self.outputs = []
         self.constants = []
-        self.STDOUT = None
-        self.filehandler = FileHandler(config.stage_point)
+        self.stdout = None
+        self.filehandler = FileHandler(config.STAGE_POINT)
 
         self.variables = []
         for key in re.findall(r"{.*?}", self.template):
@@ -69,8 +69,7 @@ class SubprocessTask(object):
         """
         if not isinstance(inputs, list):
             raise TypeError(
-                "Error - inputs must be of type list,"
-                " not of type {}".format(type(inputs))
+                f"Error - inputs must be of type list, not of type {type(inputs)}"
             )
         self.inputs = inputs
 
@@ -80,8 +79,7 @@ class SubprocessTask(object):
         """
         if not isinstance(outputs, list):
             raise TypeError(
-                "Error - outputs must be of type list,"
-                " not of type {}".format(type(outputs))
+                f"Error - outputs must be of type list, not of type {type(outputs)}"
             )
         self.outputs = outputs
 
@@ -120,9 +118,9 @@ class SubprocessTask(object):
         outputs = []
         td = tempfile.mkdtemp()
         var_dict = {}
-        for i in range(len(args)):
+        for i, arg in enumerate(args):
             if self.inputs[i] in self.variables:
-                var_dict[self.inputs[i]] = args[i]
+                var_dict[self.inputs[i]] = arg
             else:
                 if isinstance(args[i], list):
                     fnames = _gen_filenames(self.inputs[i], len(args[i]))
@@ -147,10 +145,9 @@ class SubprocessTask(object):
                     d["value"].save(op.join(td, d["name"]))
                 except AttributeError:
                     var_dict[d["name"]] = d["value"]
-        cmd = self.template.format(**var_dict)
         try:
             result = subprocess.run(
-                cmd,
+                self.template.format(**var_dict),
                 shell=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -162,19 +159,19 @@ class SubprocessTask(object):
             if DEBUGINFO not in self.outputs:
                 raise result
 
-        self.STDOUT = result.stdout.decode()
+        self.stdout = result.stdout.decode()
         for outfile in self.outputs:
             if outfile not in [STDOUT, DEBUGINFO]:
                 outfile = op.join(td, outfile)
             if "*" in outfile or "?" in outfile:
-                outf = glob.glob(outfile)
-                outf.sort()
-                outputs.append([self.filehandler.load(f) for f in outf])
+                outputs.append(
+                    [self.filehandler.load(f) for f in sorted(glob.glob(outfile))]
+                )
             else:
                 if op.exists(outfile):
                     outputs.append(self.filehandler.load(outfile))
                 elif outfile == STDOUT:
-                    outputs.append(self.STDOUT)
+                    outputs.append(self.stdout)
                 elif outfile == DEBUGINFO:
                     outputs.append(result)
                 else:
@@ -188,7 +185,7 @@ class SubprocessTask(object):
         return outputs
 
 
-class FunctionTask(object):
+class FunctionTask:
     def __init__(self, func):
         """
         Arguments:
@@ -199,7 +196,7 @@ class FunctionTask(object):
         self.outputs = []
         self.constants = {}
         self.tmpdir = None
-        self.filehandler = FileHandler(config.stage_point)
+        self.filehandler = FileHandler(config.STAGE_POINT)
 
     def __call__(self, *args):
         return self.run(*args)
@@ -297,8 +294,6 @@ class XflowError(Exception):
     """
     Base class for Crossflow exceptions.
     """
-
-    pass
 
 
 class CalledProcessError(XflowError):

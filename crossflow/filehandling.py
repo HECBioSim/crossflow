@@ -2,19 +2,7 @@
 filehanding.py: this module provides classes for passing files between
 processes on distributed computing platforms that may not share a common
 file system.
-"""
 
-import os
-import os.path as op
-import tempfile
-import uuid
-import zlib
-
-import fsspec
-
-from . import config
-
-"""
 This module defines classes to handle files in distributed environments
 where filesyatems may not be shared.
 
@@ -34,15 +22,25 @@ be used:
         ...
 """
 
+import os
+import os.path as op
+import tempfile
+import uuid
+import zlib
+
+import fsspec
+
+from . import config
+
 
 def set_stage_point(stage_point):
-    config.stage_point = stage_point
+    config.STAGE_POINT = stage_point
 
 
-class FileHandler(object):
+class FileHandler:
     def __init__(self, stage_point=None):
         if stage_point is None:
-            self.stage_point = config.stage_point
+            self.stage_point = config.STAGE_POINT
         else:
             self.stage_point = stage_point
 
@@ -53,7 +51,7 @@ class FileHandler(object):
         return FileHandle(path, self.stage_point, must_exist=False)
 
 
-class FileHandle(object):
+class FileHandle:
     """
     A portable container for a file.
     """
