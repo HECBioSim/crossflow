@@ -35,9 +35,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://"
-Repository = "https://"
-Documentation = "https://"
+Homepage = "https://www.hecbiosim.ac.uk"
+Repository = "https://github.com/HECBioSim/crossflow"
+Documentation = "https://crossflow.readthedocs.io/"
 
 [project.optional-dependencies]
 testing = [
