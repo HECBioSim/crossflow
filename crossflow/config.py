@@ -1,1 +1,5 @@
-stage_point = None
+"""
+config.py: Allow configurable options.
+"""
+
+STAGE_POINT = None

@@ -48,7 +48,7 @@ testing = [
 
 pre-commit = [
     "pre-commit==3.7.1",
-    "pylint==3.2.5"
+    "pylint==3.3.8"
 ]
 docs = [
     "sphinx",
@@ -61,27 +61,7 @@ docs = [
 ]
 
 [tool.pylint.messages_control]
-disable = [
-    "too-many-nested-blocks",
-    "no-else-return",
-    "too-many-branches",
-    "too-many-statements",
-    "missing-function-docstring",
-    "consider-using-max-builtin",
-    "useless-object-inheritance",
-    "no-member",
-    "consider-using-enumerate",
-    "consider-using-f-string",
-    "invalid-name",
-    "missing-module-docstring",
-    "consider-using-dict-items",
-    "missing-class-docstring",
-    "deprecated-class",
-    "pointless-string-statement",
-    "too-many-locals",
-    "raise-missing-from",
-    "unnecessary-pass",
-]
+disable = []
 
 [tool.pylint.format]
 max-line-length = 120
