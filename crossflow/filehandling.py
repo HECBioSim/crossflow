@@ -76,8 +76,18 @@ class FileHandle:
         if not isinstance(path, (os.PathLike, str, bytes)):
             raise IOError(f"Error - illegal argument type {type(path)} for {path}")
         if must_exist:
-            if not os.path.exists(path):
-                raise IOError("Error - no such file")
+            if isinstance(path, str) and (path.startswith("http://") or
+                                          path.startswith("https://") or
+                                          path.startswith("ftp://")):
+                    try:
+                        source = fsspec.open(path)
+                        with source as s:
+                            s.read(1)
+                    except Exception:
+                        raise IOError("Error - no such file")
+            else:
+                if not os.path.exists(path):
+                    raise IOError("Error - no such file")
             source = fsspec.open(path)
             ext = os.path.splitext(path)[1]
             self.path = path
