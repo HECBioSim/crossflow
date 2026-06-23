@@ -42,11 +42,19 @@ def _gen_filenames(pattern, n_files):
 class SubprocessTask:
     """
     A task that runs a command-line executable
+
+    Methods:
+        set_inputs: set the inputs the task requires
+        set_outputs: set the outputs the task produces
+        set_constant: set a constant for the task
+        run: execute the task
+
     """
 
     def __init__(self, template):
         """
-        Arguments:
+        Initialize the SubprocessTask.
+        args:
             template (str): a template for the command to be executed
         """
         self.template = template
@@ -66,6 +74,10 @@ class SubprocessTask:
     def set_inputs(self, inputs):
         """
         Set the inputs the task requires
+
+        args:
+            inputs (list): a list of input variable names
+
         """
         if not isinstance(inputs, list):
             raise TypeError(
@@ -76,6 +88,10 @@ class SubprocessTask:
     def set_outputs(self, outputs):
         """
         Set the outputs the task produces
+
+        args:
+            outputs (list): a list of output variable names
+
         """
         if not isinstance(outputs, list):
             raise TypeError(
@@ -88,6 +104,11 @@ class SubprocessTask:
         Set a constant for the task
         If it was previously defined as an input variable, remove it from
         that list.
+
+        args:
+            key (str): the name of the constant
+            value (str): the value of the constant
+
         """
         d = {"name": key}
         try:
@@ -194,7 +215,8 @@ class FunctionTask:
 
     def __init__(self, func):
         """
-        Arguments:
+        Initialize the FunctionTask.
+        args:
             func: the Python function to wrap
         """
         self.func = func
@@ -210,18 +232,31 @@ class FunctionTask:
     def set_inputs(self, inputs):
         """
         Set the inputs the task requires
+
+        args:
+            inputs (list): a list of input variable names
+
         """
         self.inputs = inputs
 
     def set_outputs(self, outputs):
         """
         Set the outputs the task produces
+
+        args:
+            outputs (list): a list of output variable names
+            
         """
         self.outputs = outputs
 
     def set_constant(self, key, value):
         """
-        Set a parameters for the task
+        Set a constant for the task
+
+        args:
+            key (str): the name of the constant
+            value (str): the value of the constant
+            
         """
         try:
             self.constants[key] = self.filehandler.load(value)
