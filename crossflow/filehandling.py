@@ -123,8 +123,8 @@ class FileHandle:
                         source = fsspec.open(path)
                         with source as s:
                             s.read(1)
-                    except Exception:
-                        raise IOError("Error - no such file")
+                    except Exception as e:
+                        raise IOError("Error - no such file") from e
             else:
                 if not os.path.exists(path):
                     raise IOError("Error - no such file")
