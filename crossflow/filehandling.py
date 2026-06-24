@@ -116,9 +116,11 @@ class FileHandle:
         if not isinstance(path, (os.PathLike, str, bytes)):
             raise IOError(f"Error - illegal argument type {type(path)} for {path}")
         if must_exist:
-            if isinstance(path, str) and (path.startswith("http://") or
-                                          path.startswith("https://") or
-                                          path.startswith("ftp://")):
+            if isinstance(path, str) and (
+                path.startswith("http://") or
+                path.startswith("https://") or
+                path.startswith("ftp://")
+                ):
                     try:
                         source = fsspec.open(path)
                         with source as s:
