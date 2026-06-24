@@ -245,7 +245,7 @@ class FunctionTask:
 
         args:
             outputs (list): a list of output variable names
-            
+
         """
         self.outputs = outputs
 
@@ -256,7 +256,7 @@ class FunctionTask:
         args:
             key (str): the name of the constant
             value (str): the value of the constant
-            
+
         """
         try:
             self.constants[key] = self.filehandler.load(value)

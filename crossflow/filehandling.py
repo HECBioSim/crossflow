@@ -94,17 +94,17 @@ class FileHandle:
         fh = FileHandle('http://example.com/file.txt')
 
     and has a save() method that creates a local copy of that file:
-    
+
         filename_here = fh.save(filename_here)
 
     FileHandle objects inherit from os.PathLike so can be used anywhere a
     conventional path can be used:
-    
+
         with open(fh) as f:
             ...
-    
+
     They can also be used to read and write binary and text data directly:
-    
+
         data = fh.read_binary()
         text = fh.read_text()
         fh.write_binary(data)
@@ -117,16 +117,16 @@ class FileHandle:
             raise IOError(f"Error - illegal argument type {type(path)} for {path}")
         if must_exist:
             if isinstance(path, str) and (
-                path.startswith("http://") or
-                path.startswith("https://") or
-                path.startswith("ftp://")
-                ):
-                    try:
-                        source = fsspec.open(path)
-                        with source as s:
-                            s.read(1)
-                    except Exception as e:
-                        raise IOError("Error - no such file") from e
+                path.startswith("http://")
+                or path.startswith("https://")
+                or path.startswith("ftp://")
+            ):
+                try:
+                    source = fsspec.open(path)
+                    with source as s:
+                        s.read(1)
+                except Exception as e:
+                    raise IOError("Error - no such file") from e
             else:
                 if not os.path.exists(path):
                     raise IOError("Error - no such file")
