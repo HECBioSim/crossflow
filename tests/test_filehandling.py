@@ -52,9 +52,11 @@ def test_file_protocol(tmpdir):
 
 def test_url_protocol():
     fh = filehandling.FileHandler()
-    f = fh.load('https://raw.githubusercontent.com/HECBioSim/crossflow/refs/heads/main/README.md')
+    f = fh.load(
+        "https://raw.githubusercontent.com/HECBioSim/crossflow/refs/heads/main/README.md"
+    )
 
-    
+
 """
 def test_s3_protocol(tmpdir):
     d = tmpdir.mkdir('sub')
