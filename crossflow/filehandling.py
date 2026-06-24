@@ -16,7 +16,7 @@ and have a save() method that creates a local copy of that file:
     filename_here = fh.save(filename_here)
 
 they inherit from os.PathLike so can be used anywhere a conventional path can
-be used:
+be used e.g.
 
     with open(fh) as f:
         ...
@@ -44,6 +44,7 @@ def set_stage_point(stage_point):
 class FileHandler:
     """
     Handle file operations
+
     """
 
     def __init__(self, stage_point=None):
@@ -55,13 +56,27 @@ class FileHandler:
     def load(self, path):
         """
         Method to load file.
+
+        args:
+            path (str): file path or URL
+
+        returns:
+            FileHandle: a FileHandle object
+
         """
 
         return FileHandle(path, self.stage_point, must_exist=True)
 
     def create(self, path):
         """
-        Method to load file.
+        Method to create a new file.
+
+        args:
+            path (str): file path
+
+        returns:
+            FileHandle: a FileHandle object
+
         """
 
         return FileHandle(path, self.stage_point, must_exist=False)
@@ -70,14 +85,51 @@ class FileHandler:
 class FileHandle:
     """
     A portable container for a file.
+
+    a FileHandle object is instantiated with the path of an existing file on
+    an existing file system:
+
+        fh = FileHandle('/path/to/file')
+    or:
+        fh = FileHandle('http://example.com/file.txt')
+
+    and has a save() method that creates a local copy of that file:
+
+        filename_here = fh.save(filename_here)
+
+    FileHandle objects inherit from os.PathLike so can be used anywhere a
+    conventional path can be used:
+
+        with open(fh) as f:
+            ...
+
+    They can also be used to read and write binary and text data directly:
+
+        data = fh.read_binary()
+        text = fh.read_text()
+        fh.write_binary(data)
+        fh.write_text(text)
+
     """
 
     def __init__(self, path, stage_point, must_exist=True):
         if not isinstance(path, (os.PathLike, str, bytes)):
             raise IOError(f"Error - illegal argument type {type(path)} for {path}")
         if must_exist:
-            if not os.path.exists(path):
-                raise IOError("Error - no such file")
+            if isinstance(path, str) and (
+                path.startswith("http://")
+                or path.startswith("https://")
+                or path.startswith("ftp://")
+            ):
+                try:
+                    source = fsspec.open(path)
+                    with source as s:
+                        s.read(1)
+                except Exception as e:
+                    raise IOError("Error - no such file") from e
+            else:
+                if not os.path.exists(path):
+                    raise IOError("Error - no such file")
             source = fsspec.open(path)
             ext = os.path.splitext(path)[1]
             self.path = path
@@ -180,6 +232,10 @@ class FileHandle:
     def write_binary(self, data):
         """
         A method for writing binary file formats
+
+        args:
+            data (bytes): binary data to write
+
         """
 
         compressed_data = zlib.compress(data)
@@ -194,6 +250,10 @@ class FileHandle:
     def write_text(self, text):
         """
         A wrapper for writing binary formatted text.
+
+        args:
+            text (str): text data to write
+
         """
 
         self.write_binary(text.encode("utf-8"))

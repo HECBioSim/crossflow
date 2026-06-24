@@ -32,6 +32,8 @@ dependencies = [
     "dask",
     "distributed",
     "fsspec",
+    "requests",
+    "aiohttp"
 ]
 
 [project.urls]
