@@ -56,7 +56,7 @@ jobs:
       - name: Set up Python 3.13
         uses: actions/setup-python@v7.0.0
         with:
-          python-version: 3.13
+          python-version: 3.14
       - name: Install python dependencies
         run: |
           pip install --upgrade pip
@@ -72,7 +72,7 @@ jobs:
       - name: Set up Python 3.13
         uses: actions/setup-python@v7.0.0
         with:
-          python-version: 3.13
+          python-version: 3.14
       - name: Install python dependencies
         run: |
           pip install --upgrade pip
