@@ -43,7 +43,7 @@ Documentation = "https://crossflow.readthedocs.io/"
 
 [project.optional-dependencies]
 testing = [
-    "pytest==8.2.2",
+    "pytest==8.4.2",
     "pytest-cov==5.0.0",
     "pytest-sugar==1.0.0"
 ]
