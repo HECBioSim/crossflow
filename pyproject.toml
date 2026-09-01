@@ -50,7 +50,7 @@ testing = [
 
 pre-commit = [
     "pre-commit==3.8.0",
-    "pylint==3.3.9"
+    "pylint==4.0.8"
 ]
 docs = [
     "sphinx",
