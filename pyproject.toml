@@ -24,9 +24,18 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: 3.15",
     "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: System :: Distributed Computing",
+    "Topic :: Utilities",
+    "Topic :: Software Development :: Libraries",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Unix",
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
-    "Development Status :: 3 - Alpha"
+    'Development Status :: 5 - Production/Stable',
 ]
 keywords = ["hpc", "workflows", "molecular dynamics"]
 requires-python = ">=3.11"
