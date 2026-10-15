@@ -32,7 +32,7 @@ classifiers = [
     'Topic :: Software Development :: Libraries',
     'Operating System :: MacOS :: MacOS X',
     'Operating System :: POSIX :: Linux',
-    'Operating System :: Unix'
+    'Operating System :: Unix',
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     'Development Status :: 5 - Production/Stable',
